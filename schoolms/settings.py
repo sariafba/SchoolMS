@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# auth user
+
+AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 
@@ -41,13 +44,13 @@ INSTALLED_APPS = [
     # DRF
     'rest_framework',
 
+    # auth
+    'dj_rest_auth',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+
     # modules
     'users.apps.UsersConfig',
-
-    # auth
-    'rest_framework.authtoken',
-    'dj_rest_auth',
-
 ]
 
 MIDDLEWARE = [
@@ -64,18 +67,23 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    )
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    
+    )
 }
-
-# auth user
-
-AUTH_USER_MODEL = 'users.CustomUser'
 
 # dj_rest_auth
 
 REST_AUTH = {
-    'LOGIN_SERIALIZER': 'users.api.serializers.CustomJWTSerializer',
     'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,
+    'ACCOUNT_LOGOUT_ON_GET': True
+}
+
+# simple jwt
+
+SIMPLE_JWT = {
+    'SIGNING_KEY': SECRET_KEY,  
+    'ALGORITHM': 'HS256',
 }
 
 
@@ -86,8 +94,7 @@ REST_AUTH = {
 
 
 
-
-ROOT_URLCONF = 'app.urls'
+ROOT_URLCONF = 'schoolms.urls'
 
 TEMPLATES = [
     {
@@ -104,7 +111,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'app.wsgi.application'
+WSGI_APPLICATION = 'schoolms.wsgi.application'
 
 
 # Database
@@ -122,18 +129,18 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 
