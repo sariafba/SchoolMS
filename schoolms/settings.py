@@ -87,7 +87,7 @@ SIMPLE_JWT = {
 }
 
 
-
+# APPEND_SLASH=False
 
 
 
