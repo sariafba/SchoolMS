@@ -81,3 +81,17 @@ class CooperatorSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+class ToumehCooperatorSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    role = RoleSerializer(read_only=True)
+    roleID = serializers.PrimaryKeyRelatedField(
+        queryset=Role.objects.all(),
+        source='role',
+        write_only=True,
+        required=False,
+    )
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'user', 'role', 'roleID', ...]

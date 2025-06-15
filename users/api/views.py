@@ -1,13 +1,16 @@
 # views.py
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from users.models import Employee, Role as R
+from rest_framework.viewsets import ReadOnlyModelViewSet
+
+from users.models import Employee, Role
 from .serializers import CooperatorSerializer,RoleSerializer
 from django.shortcuts import get_object_or_404
 
 
-class Cooperator(APIView):
+class CooperatorView(APIView):
     def get(self, request, pk=None):
         if pk:
             employee = get_object_or_404(Employee, pk=pk, role__name="cooperator")
@@ -43,14 +46,27 @@ class Cooperator(APIView):
 
 
 
-class Role(APIView):
+class RoleView(APIView):
     def get(self, request, pk=None):
 
         if pk:
-            role = get_object_or_404(R, pk=pk)
+            role = get_object_or_404(Role, pk=pk)
             serializer = RoleSerializer(role)
             return Response(serializer.data)
         else:
-            roles = R.objects.all()
+            roles = Role.objects.all()
             serializer = RoleSerializer(roles, many=True)
             return Response(serializer.data)
+
+class RoleViewSet(ReadOnlyModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+
+class CooperatorListCreateView(ListCreateAPIView):
+    serializer_class = CooperatorSerializer
+    queryset = Employee.objects.filter(role__name="cooperator")
+
+class CooperatorRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    serializer_class = CooperatorSerializer
+    queryset = Employee.objects.filter(role__name="cooperator")
+
