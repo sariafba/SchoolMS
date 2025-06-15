@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
                 self.fields['phone'].required = False
 
 
-
 class RoleSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -30,7 +29,16 @@ class RoleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CooperatorSerializer(serializers.ModelSerializer):
+class RoleQuerySerializer(serializers.Serializer):
+    role_name = serializers.CharField(required=False)
+
+    def validate_role_name(self, value):
+        if not Role.objects.filter(name=value).exists():
+            raise serializers.ValidationError(f"Role '{value}' does not exist.")
+        return value
+
+
+class EmployeeSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
     role = RoleSerializer(read_only=True)
@@ -38,14 +46,20 @@ class CooperatorSerializer(serializers.ModelSerializer):
         queryset=Role.objects.all(),
         source='role',
         write_only=True,
-        required=False,
     )
 
     class Meta:
         model = Employee
         fields = [
-            'id', 'user', 'role', 'roleID', 'salary',
-            'contract_start', 'contract_end', 'day_start', 'day_end'
+            'id',
+            'user',
+            'role',
+            'roleID',
+            'salary',
+            'contract_start',
+            'contract_end',
+            'day_start',
+            'day_end'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -54,6 +68,7 @@ class CooperatorSerializer(serializers.ModelSerializer):
             # Proper way to handle nested serializer context
             self.fields['user'] = UserSerializer(context=self.context)
             self.fields['user'].required = False
+            self.fields['roleID'].required = False
 
     @transaction.atomic
     def create(self, validated_data):
@@ -63,8 +78,7 @@ class CooperatorSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         
-        role = Role.objects.get(name='cooperator')
-        return Employee.objects.create(user=user, role=role, **validated_data)
+        return Employee.objects.create(user=user, **validated_data)
             
     @transaction.atomic
     def update(self, instance, validated_data):

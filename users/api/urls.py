@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import Cooperator, Role
+from .views import EmployeeView, RoleView
 
 urlpatterns = [
 
@@ -7,10 +7,10 @@ urlpatterns = [
     path('auth/', include('dj_rest_auth.urls')),
 
     # Cooperator
-    path('cooperators/', Cooperator.as_view()),         # GET all, POST
-    path('cooperators/<int:pk>', Cooperator.as_view()), # GET one, PUT, DELETE    
+    path('employees/', EmployeeView.as_view()),         # GET all, POST
+    path('employees/<int:pk>', EmployeeView.as_view()), # GET one, PUT, DELETE    
 
     # Role
-    path('roles/', Role.as_view()),
-    path('roles/<int:pk>', Role.as_view()),
+    path('roles/', RoleView.as_view()),
+    path('roles/<int:pk>', RoleView.as_view()),
 ]
