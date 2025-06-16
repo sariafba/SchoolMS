@@ -26,6 +26,8 @@ class Employee(models.Model):
     def __str__(self):
         return self.user.username
 
-# class Teacher(models.Model):
-#     employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name='teacher')
+class Teacher(models.Model):
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name='teacher')
 
+    def __str__(self):
+        return self.employee.user.username

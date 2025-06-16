@@ -1,7 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from users.models import Employee, Role
+from users.models import Employee, Role, Teacher
 from django.db import transaction
 
 User = get_user_model()
@@ -69,6 +69,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
             self.fields['user'] = UserSerializer(context=self.context)
             self.fields['user'].required = False
             self.fields['roleID'].required = False
+            self.fields['salary'].required = False
+            self.fields['contract_start'].required = False
+            self.fields['contract_end'].required = False
+            self.fields['day_start'].required = False
+            self.fields['day_end'].required = False
 
     @transaction.atomic
     def create(self, validated_data):
@@ -78,10 +83,17 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         
-        return Employee.objects.create(user=user, **validated_data)
+        employee = Employee.objects.create(user=user, **validated_data)
+
+        if validated_data['role'] == Role.objects.get(name='teacher'):
+            Teacher.objects.create(employee=employee)
+
+        return employee
+
             
     @transaction.atomic
     def update(self, instance, validated_data):
+
         user_data = validated_data.pop('user', None)
         if user_data:
             password = user_data.pop('password', None)
@@ -90,6 +102,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
             if password:
                 instance.user.set_password(password)
             instance.user.save()
+
+        if validated_data['role'] == Role.objects.get(name='teacher'):
+            Teacher.objects.update_or_create(employee=instance)
+        else:
+            Teacher.objects.filter(employee=instance).delete()
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
