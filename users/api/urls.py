@@ -1,5 +1,9 @@
 from django.urls import path, include
 from .views import EmployeeView, RoleView
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register('roles', RoleView)  # Uses ViewSet for list + retrieve
 
 urlpatterns = [
 
@@ -11,6 +15,7 @@ urlpatterns = [
     path('employees/<int:pk>', EmployeeView.as_view()), # GET one, PUT, DELETE    
 
     # Role
-    path('roles/', RoleView.as_view()),
-    path('roles/<int:pk>', RoleView.as_view()),
+    path('', include(router.urls)),
+    # path('roles/', RoleView.as_view()),
+    # path('roles/<int:pk>', RoleView.as_view()),
 ]

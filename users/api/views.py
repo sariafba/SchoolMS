@@ -1,5 +1,7 @@
 # views.py
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
@@ -61,19 +63,11 @@ class EmployeeView(APIView):
         return Response({"message": "Employee deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
-class RoleView(APIView):
+class RoleView(ReadOnlyModelViewSet):
 
-    permission_classes=[IsAdminUser]
-
-    def get(self, request, pk=None):
-        if pk:
-            role = get_object_or_404(Role, pk=pk)
-            serializer = RoleSerializer(role)
-            return Response(serializer.data)
-        else:
-            roles = Role.objects.all()
-            serializer = RoleSerializer(roles, many=True)
-            return Response(serializer.data)
+    # permission_classes=[IsAdminUser]
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
         
 
     
