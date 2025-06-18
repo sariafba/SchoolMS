@@ -1,8 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.serializers import ModelSerializer
 from .serializers import *
 from school.models import *
 
 class SubjectView(ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+
+class StudyYearView(ModelViewSet):
+    queryset = StudyYear.objects.all()
+    serializer_class = StudyYearSerializer

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from school.models import Subject
+from school.models import Subject, StudyYear
 from users.models import Role
 
 class Command(BaseCommand):
@@ -20,10 +20,34 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f'Unknown app: {app}'))
 
         else:
-            self.seed_school()
             self.seed_users()
+            self.seed_school()
+
+
+
+    def seed_users(self):
+
+        #seed roles
+        self.stdout.write(self.style.WARNING('seeding roles...'))
+        Role.objects.all().delete()
+        Role.objects.create(name='admin')
+        Role.objects.create(name='cooperator')
+        Role.objects.create(name='teacher')
+        self.stdout.write(self.style.SUCCESS('✅ roles seeded.'))
 
     def seed_school(self):
+
+        # seed study years
+        self.stdout.write(self.style.WARNING('seeding study years...'))
+        StudyYear.objects.all().delete()
+        StudyYear.objects.create(name='2020/2021')
+        StudyYear.objects.create(name='2021/2022')
+        StudyYear.objects.create(name='2022/2023')
+        StudyYear.objects.create(name='2023/2024')
+        StudyYear.objects.create(name='2024/2025')
+        self.stdout.write(self.style.SUCCESS('✅ study years seeded.'))
+
+        # seed subjects
         self.stdout.write(self.style.WARNING('seeding subjects...'))
         Subject.objects.all().delete()
         Subject.objects.create(name='Arabic')
@@ -39,11 +63,3 @@ class Command(BaseCommand):
         Subject.objects.create(name='Music')
         Subject.objects.create(name='Art')
         self.stdout.write(self.style.SUCCESS('✅ subjects seeded.'))
-
-    def seed_users(self):
-        self.stdout.write(self.style.WARNING('seeding roles...'))
-        Role.objects.all().delete()
-        Role.objects.create(name='admin')
-        Role.objects.create(name='cooperator')
-        Role.objects.create(name='teacher')
-        self.stdout.write(self.style.SUCCESS('✅ roles seeded.'))
