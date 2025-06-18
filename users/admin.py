@@ -6,12 +6,19 @@ from .models import User, Role, Employee, Teacher
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ['id','username', 'phone', 'first_name', 'last_name']
+    ordering = ['id']
+    
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
+    ordering = ['id']
+
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ['id', 'user__username', 'salary', 'contract_start', 'contract_end', 'day_start', 'day_end']
+    ordering = ['id']
+
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
     list_display = ['id', 'employee__user__username']
+    ordering = ['id']

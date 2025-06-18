@@ -51,6 +51,8 @@ INSTALLED_APPS = [
 
     # modules
     'users.apps.UsersConfig',
+    'school.apps.SchoolConfig',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -68,7 +70,8 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    
-    )
+    ),
+    # 'URL_TRAILING_SLASH': False,  # <--- This disables the enforced slash
 }
 
 # dj_rest_auth
@@ -88,6 +91,8 @@ SIMPLE_JWT = {
 
 
 # APPEND_SLASH=False
+
+
 
 
 
