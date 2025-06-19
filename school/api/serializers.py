@@ -28,6 +28,21 @@ class StudyStageSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class GradeSerializer(serializers.ModelSerializer):
+    
+    study_stage = StudyStageSerializer(read_only=True)
+    study_stage_id = serializers.PrimaryKeyRelatedField(
+        queryset=StudyStage.objects.all(), write_only=True, source='study_stage'
+    )
+
+    study_year = StudyYearSerializer(read_only=True)
+    study_year_id = serializers.PrimaryKeyRelatedField(
+        queryset=StudyYear.objects.all(), write_only=True, source='study_year'
+    )
+    
+    class Meta:
+        model = Grade
+        fields = '__all__'
 
 
 

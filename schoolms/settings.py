@@ -72,6 +72,7 @@ REST_FRAMEWORK = {
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    
     ),
     # 'URL_TRAILING_SLASH': False,  # <--- This disables the enforced slash
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 # dj_rest_auth

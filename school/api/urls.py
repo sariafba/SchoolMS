@@ -6,6 +6,7 @@ router = DefaultRouter(trailing_slash=False)
 router.register('subjects', SubjectView)
 router.register('study-years', StudyYearView)
 router.register('study-stages', StudyStageView)
+router.register('grades', GradeView)
 
 urlpatterns = [
     path('', include(router.urls)),

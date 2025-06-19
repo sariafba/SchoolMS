@@ -17,5 +17,26 @@ class StudyYear(models.Model):
         ]
     )
 
+    def __str__(self):
+        return self.name
+
 class StudyStage(models.Model):
     name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Grade(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    study_stage = models.ForeignKey(StudyStage, on_delete=models.CASCADE)
+    study_year = models.ForeignKey(StudyYear, on_delete=models.CASCADE)
+
+class Section(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    grade = models.ForeignKey(Grade, on_delete=models.CASCADE)
+
+
+
+
+
+

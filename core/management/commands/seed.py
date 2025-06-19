@@ -59,6 +59,22 @@ class Command(BaseCommand):
         StudyStage.objects.create(name='elementary')
         self.stdout.write(self.style.SUCCESS('✅ study stages seeded.'))
 
+
+        #seed grades
+        self.stdout.write(self.style.WARNING('seeding grades...'))
+        Grade.objects.all().delete()
+        self.reset_sequence(Grade)
+        Grade.objects.create(name='KG1', study_stage=StudyStage.objects.get(name='kindergarten'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='KG2', study_stage=StudyStage.objects.get(name='kindergarten'), study_year=StudyYear.objects.get(name='2020/2021'))
+
+        Grade.objects.create(name='Grade 1', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='Grade 2', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='Grade 3', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='Grade 4', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='Grade 5', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        Grade.objects.create(name='Grade 6', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
+        self.stdout.write(self.style.SUCCESS('✅ grades seeded.'))
+
         # seed subjects
         self.stdout.write(self.style.WARNING('seeding subjects...'))
         Subject.objects.all().delete()
