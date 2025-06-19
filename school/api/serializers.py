@@ -1,8 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from django.db import transaction
 from school.models import *
-
 
 
 
@@ -23,3 +20,18 @@ class StudyYearSerializer(serializers.ModelSerializer):
         if end != start + 1:
             raise serializers.ValidationError("End year must be exactly one year after the start year.")
         return value
+    
+
+class StudyStageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudyStage
+        fields = '__all__'
+
+
+
+
+
+
+
+
+

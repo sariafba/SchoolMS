@@ -17,3 +17,5 @@ class StudyYear(models.Model):
         ]
     )
 
+class StudyStage(models.Model):
+    name = models.CharField(max_length=100, unique=True)

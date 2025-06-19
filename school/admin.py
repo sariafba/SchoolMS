@@ -11,3 +11,8 @@ class SubjectAdmin(admin.ModelAdmin):
 class StudyYearAdmin(admin.ModelAdmin):
     list_display = ['id', 'name']
     ordering = ['id']
+
+@admin.register(StudyStage)
+class StudyStageAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']
+    ordering = ['id']
