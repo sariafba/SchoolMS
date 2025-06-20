@@ -75,6 +75,29 @@ class Command(BaseCommand):
         Grade.objects.create(name='Grade 6', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
         self.stdout.write(self.style.SUCCESS('✅ grades seeded.'))
 
+        #seed sections
+        self.stdout.write(self.style.WARNING('seeding sections...'))
+        Section.objects.all().delete()
+        self.reset_sequence(Section)
+        Section.objects.create(name='A', grade=Grade.objects.get(name='KG1'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='KG1'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='KG2'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='KG2'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 1'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 1'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 2'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 2'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 3'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 3'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 4'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 4'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 5'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 5'))
+        Section.objects.create(name='A', grade=Grade.objects.get(name='Grade 6'))
+        Section.objects.create(name='B', grade=Grade.objects.get(name='Grade 6'))
+        self.stdout.write(self.style.SUCCESS('✅ sections seeded.'))
+
+
         # seed subjects
         self.stdout.write(self.style.WARNING('seeding subjects...'))
         Subject.objects.all().delete()

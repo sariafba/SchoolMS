@@ -21,3 +21,8 @@ class StudyStageAdmin(admin.ModelAdmin):
 class GradeAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'study_stage', 'study_year']
     ordering = ['id']
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'grade']
+    ordering = ['id']
