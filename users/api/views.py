@@ -40,7 +40,7 @@ class EmployeeView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = EmployeeSerializer(data=request.data)
+        serializer = EmployeeSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             employee = serializer.save()
             return Response({

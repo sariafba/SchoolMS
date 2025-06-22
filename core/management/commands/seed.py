@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models import Q
+from users.api.serializers import EmployeeSerializer
 from school.models import *
 from users.models import *
 
@@ -21,8 +23,8 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f'Unknown app: {app}'))
 
         else:
-            self.seed_users()
             self.seed_school()
+            self.seed_users()
 
 
 
@@ -32,10 +34,121 @@ class Command(BaseCommand):
         self.stdout.write(self.style.WARNING('seeding roles...'))
         Role.objects.all().delete()
         self.reset_sequence(Role)
-        Role.objects.create(name='admin')
         Role.objects.create(name='cooperator')
         Role.objects.create(name='teacher')
+        Role.objects.create(name='receptionist')
         self.stdout.write(self.style.SUCCESS('✅ roles seeded.'))
+
+
+        #seed employees
+        self.stdout.write(self.style.WARNING('seeding employees'))
+        User.objects.filter(
+            Q(username__icontains='ahmed')
+        ).delete()
+        self.reset_sequence(User)
+        self.reset_sequence(Employee)
+        self.reset_sequence(Teacher)
+
+        #1
+        serializer = EmployeeSerializer(data={
+        "user": {
+            "username": "ahmed01",
+            "password": "password",
+            "phone": "0900000001",
+            "first_name": "Ahmed1",
+            "last_name": "Marwan1"
+        },
+        "roleID": 1,
+        "salary": "5000.00",
+        "contract_start": "2024-09-01",
+        "contract_end": "2025-06-01",
+        "day_start": "08:00:00",
+        "day_end": "13:15:00"
+        })
+        if serializer.is_valid():
+            serializer.save()
+        
+        #2
+        serializer = EmployeeSerializer(data={
+        "user": {
+            "username": "ahmed02",
+            "password": "password",
+            "phone": "0900000002",
+            "first_name": "Ahmed2",
+            "last_name": "Marwan2"
+        },
+        "roleID": 1,
+        "salary": "3500.00",
+        "contract_start": "2024-09-01",
+        "contract_end": "2025-06-01",
+        "day_start": "08:00:00",
+        "day_end": "13:15:00"
+        })
+        if serializer.is_valid():
+            serializer.save()
+
+        #3
+        serializer = EmployeeSerializer(data={
+        "user": {
+            "username": "ahmed03",
+            "password": "password",
+            "phone": "0900000003",
+            "first_name": "Ahmed3",
+            "last_name": "Marwan3"
+        },
+        "roleID": 2,
+        "subjectIDs": [5,6],
+        "salary": "7000.00",
+        "contract_start": "2024-09-01",
+        "contract_end": "2025-06-01",
+        "day_start": "08:00:00",
+        "day_end": "13:15:00"
+        })
+        if serializer.is_valid():
+            serializer.save()
+        
+
+        #4
+        serializer = EmployeeSerializer(data={
+        "user": {
+            "username": "ahmed04",
+            "password": "password",
+            "phone": "0900000004",
+            "first_name": "Ahmed4",
+            "last_name": "Marwan4"
+        },
+        "roleID": 2,
+        "subjectIDs": [4],
+        "salary": "10000.00",
+        "contract_start": "2024-09-01",
+        "contract_end": "2025-06-01",
+        "day_start": "08:00:00",
+        "day_end": "13:15:00"
+        })
+        if serializer.is_valid():
+            serializer.save()
+
+        #5
+        serializer = EmployeeSerializer(data={
+        "user": {
+            "username": "ahmed05",
+            "password": "password",
+            "phone": "0900000005",
+            "first_name": "Ahmed5",
+            "last_name": "Marwan5"
+        },
+        "roleID": 1,
+        "salary": "2000.00",
+        "contract_start": "2024-09-01",
+        "contract_end": "2025-06-01",
+        "day_start": "08:00:00",
+        "day_end": "13:15:00"
+        })
+        if serializer.is_valid():
+            serializer.save()
+
+        self.stdout.write(self.style.SUCCESS('✅ employees seeded.'))
+
 
 
     def seed_school(self):

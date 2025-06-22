@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from school.models import Subject
 
 
 class User(AbstractUser):
@@ -28,6 +29,7 @@ class Employee(models.Model):
 
 class Teacher(models.Model):
     employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name='teacher')
+    subjects = models.ManyToManyField(Subject, related_name='teachers')
 
     def __str__(self):
         return self.employee.user.username

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from users.models import Employee, Role, Teacher
 from django.db import transaction
+from school.models import Subject
 
 User = get_user_model()
 
@@ -47,6 +48,12 @@ class EmployeeSerializer(serializers.ModelSerializer):
         source='role',
         write_only=True,
     )
+    subjectIDs = serializers.PrimaryKeyRelatedField(
+    queryset=Subject.objects.all(),
+    write_only=True,
+    many=True,
+    required=False
+)
 
     class Meta:
         model = Employee
@@ -55,38 +62,55 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'user',
             'role',
             'roleID',
+            'subjectIDs',
             'salary',
             'contract_start',
             'contract_end',
             'day_start',
             'day_end'
+
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.context.get('request') and self.context['request'].method == 'PUT':
+
+        request = self.context.get('request')
+        if request and request.method == 'PUT':
             # Proper way to handle nested serializer context
-            self.fields['user'] = UserSerializer(context=self.context)
-            self.fields['user'].required = False
-            self.fields['roleID'].required = False
-            self.fields['salary'].required = False
-            self.fields['contract_start'].required = False
-            self.fields['contract_end'].required = False
-            self.fields['day_start'].required = False
-            self.fields['day_end'].required = False
+            self.fields['user'] = UserSerializer(context=self.context, required=False)
+            for field in ['roleID', 'salary', 'contract_start', 'contract_end', 'day_start', 'day_end']:
+                self.fields[field].required = False
+
+    def validate(self, attrs):
+        # request = self.context.get('request')
+        role = attrs.get('role') or getattr(self.instance, 'role', None)
+        # if request and request.method == 'POST':
+        if role and role.id == 2:  # Role ID 2 is 'teacher'
+            if not attrs.get('subjectIDs'):
+                raise serializers.ValidationError({
+                    'subjectIDs': 'This field is required when role is teacher.'
+                })
+        return attrs
 
     @transaction.atomic
     def create(self, validated_data):
+
+        # user creating
         user_data = validated_data.pop('user')
         password = user_data.pop('password')
         user = User(**user_data)
         user.set_password(password)
         user.save()
         
+        # employee creating
+        subjectIDs = validated_data.pop('subjectIDs', None)
         employee = Employee.objects.create(user=user, **validated_data)
 
+        # if teacher creating
         if validated_data['role'] == Role.objects.get(name='teacher'):
-            Teacher.objects.create(employee=employee)
+            teacher = Teacher.objects.create(employee=employee)
+            teacher.subjects.set(subjectIDs)
+            
 
         return employee
 
@@ -94,6 +118,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def update(self, instance, validated_data):
 
+        # user updating
         user_data = validated_data.pop('user', None)
         if user_data:
             password = user_data.pop('password', None)
@@ -103,12 +128,19 @@ class EmployeeSerializer(serializers.ModelSerializer):
                 instance.user.set_password(password)
             instance.user.save()
 
-        if validated_data['role'] == Role.objects.get(name='teacher'):
-            Teacher.objects.update_or_create(employee=instance)
-        else:
-            Teacher.objects.filter(employee=instance).delete()
-
+        # employee updating
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+
+        # teacher updating
+        subjectIDs = validated_data.pop('subjectIDs', None)
+        
+        if validated_data['role'] == Role.objects.get(name='teacher'):        
+            teacher, _ = Teacher.objects.update_or_create(employee=instance)
+            if subjectIDs:
+                teacher.subjects.set(subjectIDs)
+        else:
+            Teacher.objects.filter(employee=instance).delete()
+
         return instance
