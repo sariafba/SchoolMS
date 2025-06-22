@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from users.models import Employee, Role, Teacher
 from django.db import transaction
 from school.models import Subject
+from school.api.serializers import SubjectSerializer
 
 User = get_user_model()
 
@@ -42,18 +43,23 @@ class RoleQuerySerializer(serializers.Serializer):
 class EmployeeSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
+
     role = RoleSerializer(read_only=True)
     roleID = serializers.PrimaryKeyRelatedField(
         queryset=Role.objects.all(),
         source='role',
         write_only=True,
     )
+
+    subjects = serializers.SerializerMethodField()
     subjectIDs = serializers.PrimaryKeyRelatedField(
-    queryset=Subject.objects.all(),
-    write_only=True,
-    many=True,
-    required=False
-)
+        queryset=Subject.objects.all(),
+        source='subjects',
+        write_only=True,
+        many=True,
+        required=False
+    )
+
 
     class Meta:
         model = Employee
@@ -62,14 +68,15 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'user',
             'role',
             'roleID',
+            'subjects',
             'subjectIDs',
             'salary',
             'contract_start',
             'contract_end',
             'day_start',
             'day_end'
-
         ]
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,16 +88,25 @@ class EmployeeSerializer(serializers.ModelSerializer):
             for field in ['roleID', 'salary', 'contract_start', 'contract_end', 'day_start', 'day_end']:
                 self.fields[field].required = False
 
+
     def validate(self, attrs):
-        # request = self.context.get('request')
+        request = self.context.get('request')
         role = attrs.get('role') or getattr(self.instance, 'role', None)
-        # if request and request.method == 'POST':
-        if role and role.id == 2:  # Role ID 2 is 'teacher'
-            if not attrs.get('subjectIDs'):
-                raise serializers.ValidationError({
-                    'subjectIDs': 'This field is required when role is teacher.'
-                })
+        if request and request.method == 'POST':
+            if role and role.id == 2:  # Role ID 2 is 'teacher'
+                if not attrs.get('subjects'):
+                    raise serializers.ValidationError({
+                        'subjectIDs': 'This field is required when role is teacher.'
+                    })
         return attrs
+
+
+    def get_subjects(self, obj):
+        # Ensure the employee has a teacher relationship
+        if hasattr(obj, 'teacher'):
+            return SubjectSerializer(obj.teacher.subjects.all(), many=True).data
+        return []
+
 
     @transaction.atomic
     def create(self, validated_data):
@@ -103,7 +119,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user.save()
         
         # employee creating
-        subjectIDs = validated_data.pop('subjectIDs', None)
+        subjectIDs = validated_data.pop('subjects', None)
         employee = Employee.objects.create(user=user, **validated_data)
 
         # if teacher creating
@@ -144,3 +160,14 @@ class EmployeeSerializer(serializers.ModelSerializer):
             Teacher.objects.filter(employee=instance).delete()
 
         return instance
+    
+
+
+
+
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not hasattr(instance, 'teacher'):
+            data.pop('subjects', None)
+        return data

@@ -150,7 +150,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('✅ employees seeded.'))
 
 
-
     def seed_school(self):
 
         # seed study years
