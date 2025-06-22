@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-from datetime import timedelta
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
+    'django.contrib.staticfiles',   
+
     # DRF
     'rest_framework',
 
@@ -51,9 +51,15 @@ INSTALLED_APPS = [
 
     # modules
     'users.apps.UsersConfig',
+    'school.apps.SchoolConfig',
+    'core.apps.CoreConfig',
+
+    #
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -67,30 +73,35 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    
+    ),
+    # 'URL_TRAILING_SLASH': False,  # <--- This disables the enforced slash
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+# dj_rest_auth
 
 REST_AUTH = {
     'USE_JWT': True,
-    'JWT_AUTH_HTTPONLY': False,  # Allows JavaScript to read the JWT
-    'JWT_AUTH_REFRESH_COOKIE': 'refresh-token',
-    'ACCOUNT_LOGOUT_ON_GET': True  # Allows logout via GET request
+    'JWT_AUTH_HTTPONLY': False,
+    'ACCOUNT_LOGOUT_ON_GET': True
 }
 
-# JWT settings
+# simple jwt
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Short-lived access token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Longer-lived refresh token
-    'ROTATE_REFRESH_TOKENS': True,  # Issues new refresh token on refresh
-    'BLACKLIST_AFTER_ROTATION': True,  # Blacklists old refresh tokens
-
+    'SIGNING_KEY': SECRET_KEY,  
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-
 }
 
-# APPEND_SLASH=False
+# CORS
+
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5500",
+# ]
+
+
 
 
 
