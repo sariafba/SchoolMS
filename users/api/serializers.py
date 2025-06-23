@@ -1,7 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from users.models import Employee, Role, Teacher
+from users.models import Employee, Teacher
 from django.db import transaction
 from school.models import Subject
 from school.api.serializers import SubjectSerializer
@@ -17,24 +17,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['username', 'password', 'phone', 'first_name', 'last_name']
 
 
-class RoleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Role
-        fields = '__all__'
-
-
 class EmployeeSerializer(serializers.ModelSerializer):
 
     user = UserSerializer()
-
-    role = RoleSerializer(read_only=True)
-    roleID = serializers.PrimaryKeyRelatedField(
-        queryset=Role.objects.all(),
-        source='role',
-        write_only=True,
-    )
-
+    role = serializers.ChoiceField(choices=Employee.ROLE_CHOICES)
     subjects = serializers.SerializerMethodField()
     subjectIDs = serializers.PrimaryKeyRelatedField(
         queryset=Subject.objects.all(),
@@ -51,7 +37,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'role',
-            'roleID',
             'subjects',
             'subjectIDs',
             'salary',
@@ -67,7 +52,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         role = attrs.get('role') or getattr(self.instance, 'role', None)
 
-        if role.id == 2:  # Role ID 2 is 'teacher'
+        if role == 'teacher':
             if request.method == 'POST' or request.method == 'PATCH':
                 if not attrs.get('subjects'):
                     raise serializers.ValidationError({
@@ -92,7 +77,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         employee = Employee.objects.create(user=user, **validated_data)
 
         # teacher creating
-        if validated_data['role'] == Role.objects.get(name='teacher'):
+        if validated_data['role'] == 'teacher':
             teacher = Teacher.objects.create(employee=employee)
             teacher.subjects.set(subjects)
             
@@ -120,7 +105,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
         # teacher updating
         subjects = validated_data.pop('subjects', None)
-        if validated_data.get('role') and validated_data.get('role').id == 2:        
+        if validated_data.get('role') and validated_data.get('role') == 'teacher':        
             teacher, _ = Teacher.objects.update_or_create(employee=instance)
             if subjects:
                 teacher.subjects.set(subjects)
