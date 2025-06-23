@@ -120,7 +120,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
         # teacher updating
         subjects = validated_data.pop('subjects', None)
-        if validated_data.get('role').id == 2:        
+        if validated_data.get('role') and validated_data.get('role').id == 2:        
             teacher, _ = Teacher.objects.update_or_create(employee=instance)
             if subjects:
                 teacher.subjects.set(subjects)

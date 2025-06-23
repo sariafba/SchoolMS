@@ -4,6 +4,9 @@ from django.db.models import Q
 from users.api.serializers import EmployeeSerializer
 from school.models import *
 from users.models import *
+from rest_framework.request import Request
+from rest_framework.test import APIRequestFactory
+
 
 class Command(BaseCommand):
     help = 'seeding database with default data'
@@ -25,7 +28,6 @@ class Command(BaseCommand):
         else:
             self.seed_school()
             self.seed_users()
-
 
 
     def seed_users(self):
@@ -64,7 +66,7 @@ class Command(BaseCommand):
         "contract_end": "2025-06-01",
         "day_start": "08:00:00",
         "day_end": "13:15:00"
-        })
+        }, context={'request': Request(APIRequestFactory().post('/'))})
         if serializer.is_valid():
             serializer.save()
         
@@ -83,7 +85,7 @@ class Command(BaseCommand):
         "contract_end": "2025-06-01",
         "day_start": "08:00:00",
         "day_end": "13:15:00"
-        })
+        }, context={'request': Request(APIRequestFactory().post('/'))})
         if serializer.is_valid():
             serializer.save()
 
@@ -103,7 +105,7 @@ class Command(BaseCommand):
         "contract_end": "2025-06-01",
         "day_start": "08:00:00",
         "day_end": "13:15:00"
-        })
+        }, context={'request': Request(APIRequestFactory().post('/'))})
         if serializer.is_valid():
             serializer.save()
         
@@ -124,7 +126,7 @@ class Command(BaseCommand):
         "contract_end": "2025-06-01",
         "day_start": "08:00:00",
         "day_end": "13:15:00"
-        })
+        }, context={'request': Request(APIRequestFactory().post('/'))})
         if serializer.is_valid():
             serializer.save()
 
@@ -143,7 +145,7 @@ class Command(BaseCommand):
         "contract_end": "2025-06-01",
         "day_start": "08:00:00",
         "day_end": "13:15:00"
-        })
+        }, context={'request': Request(APIRequestFactory().post('/'))})
         if serializer.is_valid():
             serializer.save()
 
