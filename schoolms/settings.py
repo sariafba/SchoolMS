@@ -84,12 +84,13 @@ REST_FRAMEWORK = {
 REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
-    'ACCOUNT_LOGOUT_ON_GET': True
 }
 
 # simple jwt
-
+from datetime import timedelta
 SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     'SIGNING_KEY': SECRET_KEY,  
     'ALGORITHM': 'HS256',
 }

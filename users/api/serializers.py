@@ -9,19 +9,12 @@ from school.api.serializers import SubjectSerializer
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['username', 'password', 'phone', 'first_name', 'last_name']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.context.get('request'):
-            if self.context['request'].method == 'PUT':
-                self.fields['username'].required = False
-                self.fields['password'].required = False
-                self.fields['phone'].required = False
 
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -29,15 +22,6 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = '__all__'
-
-
-class RoleQuerySerializer(serializers.Serializer):
-    role_name = serializers.CharField(required=False)
-
-    def validate_role_name(self, value):
-        if not Role.objects.filter(name=value).exists():
-            raise serializers.ValidationError(f"Role '{value}' does not exist.")
-        return value
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -78,34 +62,19 @@ class EmployeeSerializer(serializers.ModelSerializer):
         ]
 
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        request = self.context.get('request')
-        if request and request.method == 'PUT':
-            # Proper way to handle nested serializer context
-            self.fields['user'] = UserSerializer(context=self.context, required=False)
-            for field in ['roleID', 'salary', 'contract_start', 'contract_end', 'day_start', 'day_end']:
-                self.fields[field].required = False
-
-
     def validate(self, attrs):
+
         request = self.context.get('request')
         role = attrs.get('role') or getattr(self.instance, 'role', None)
-        if request and request.method == 'POST':
-            if role and role.id == 2:  # Role ID 2 is 'teacher'
+
+        if role.id == 2:  # Role ID 2 is 'teacher'
+            if request.method == 'POST' or request.method == 'PATCH':
                 if not attrs.get('subjects'):
                     raise serializers.ValidationError({
                         'subjectIDs': 'This field is required when role is teacher.'
                     })
+                
         return attrs
-
-
-    def get_subjects(self, obj):
-        # Ensure the employee has a teacher relationship
-        if hasattr(obj, 'teacher'):
-            return SubjectSerializer(obj.teacher.subjects.all(), many=True).data
-        return []
 
 
     @transaction.atomic
@@ -119,13 +88,13 @@ class EmployeeSerializer(serializers.ModelSerializer):
         user.save()
         
         # employee creating
-        subjectIDs = validated_data.pop('subjects', None)
+        subjects = validated_data.pop('subjects', None)
         employee = Employee.objects.create(user=user, **validated_data)
 
-        # if teacher creating
+        # teacher creating
         if validated_data['role'] == Role.objects.get(name='teacher'):
             teacher = Teacher.objects.create(employee=employee)
-            teacher.subjects.set(subjectIDs)
+            teacher.subjects.set(subjects)
             
 
         return employee
@@ -143,27 +112,22 @@ class EmployeeSerializer(serializers.ModelSerializer):
             if password:
                 instance.user.set_password(password)
             instance.user.save()
-
+        
         # employee updating
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         # teacher updating
-        subjectIDs = validated_data.pop('subjectIDs', None)
-        
-        if validated_data['role'] == Role.objects.get(name='teacher'):        
+        subjects = validated_data.pop('subjects', None)
+        if validated_data.get('role').id == 2:        
             teacher, _ = Teacher.objects.update_or_create(employee=instance)
-            if subjectIDs:
-                teacher.subjects.set(subjectIDs)
+            if subjects:
+                teacher.subjects.set(subjects)
         else:
             Teacher.objects.filter(employee=instance).delete()
 
         return instance
-    
-
-
-
 
 
     def to_representation(self, instance):
@@ -171,3 +135,10 @@ class EmployeeSerializer(serializers.ModelSerializer):
         if not hasattr(instance, 'teacher'):
             data.pop('subjects', None)
         return data
+    
+
+    def get_subjects(self, obj):
+        # Ensure the employee has a teacher relationship
+        if hasattr(obj, 'teacher'):
+            return SubjectSerializer(obj.teacher.subjects.all(), many=True).data
+        return []
