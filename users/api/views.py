@@ -34,7 +34,6 @@ class EmployeeView(ModelViewSet):
         employee_role = self.request.user.employee.role
         allowed_roles = allowed_roles.get(employee_role, [])
         return self.queryset.filter(role__in=allowed_roles)
-        
 
     def destroy(self, request, *args, **kwargs):
         self.get_object().user.delete()

@@ -48,7 +48,23 @@ class Section(models.Model):
             models.UniqueConstraint(fields=['name', 'grade'], name='unique_section_name_per_grade')
         ]
 
+class Schedule(models.Model):
+    teacher = models.ForeignKey('users.Teacher', on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    day = models.CharField(max_length=10, choices=[
+        ('sat', 'Saturday'),
+        ('sun', 'Sunday'),
+        ('mon', 'Monday'),
+        ('tue', 'Tuesday'),
+        ('wed', 'Wednesday'),
+        ('thu', 'Thursday'),
+        ('fri', 'Friday')
+    ])
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
+    # class Meta:
+    #     unique_together = ['teacher', 'day', 'start_time']
 
 
 

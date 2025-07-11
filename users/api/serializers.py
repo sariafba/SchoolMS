@@ -5,6 +5,7 @@ from users.models import Employee, Teacher
 from django.db import transaction
 from school.models import Subject
 from school.api.serializers import SubjectSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer as BaseUserDetailsSerializer
 
 User = get_user_model()
 
@@ -16,6 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password', 'phone', 'first_name', 'last_name']
 
+class CustomUserDetailsSerializer(BaseUserDetailsSerializer):
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        if hasattr(obj, 'employee'):
+            return obj.employee.role
+        return None
+
+    class Meta(BaseUserDetailsSerializer.Meta):
+        fields = BaseUserDetailsSerializer.Meta.fields + ('role',)
 
 class EmployeeSerializer(serializers.ModelSerializer):
 

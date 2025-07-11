@@ -14,5 +14,9 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
-    list_display = ['id', 'employee__user__username']
+    list_display = ['id', 'employee__user__username', 'get_subjects']
     ordering = ['id']
+
+    def get_subjects(self, obj):
+        return ", ".join([subject.name for subject in obj.subjects.all()])
+    get_subjects.short_description = 'Subjects'

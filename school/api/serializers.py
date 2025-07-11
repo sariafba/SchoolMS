@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from school.models import *
-
-
+from users.models import Teacher
+from users.models import Employee
 
 class SubjectSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,6 +59,72 @@ class SectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
         fields = ['id', 'name', 'grade_id', 'grade']
+
+class EmployeeSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    subjects = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'username', 'subjects']
+
+    def get_username(self, obj):
+        return obj.employee.user.username
+    
+    def get_subjects(self, obj):
+        return SubjectSerializer(obj.subjects.all(), many=True).data
+
+class ScheduleSerializer(serializers.ModelSerializer):
+
+    teacher = EmployeeSerializer(read_only=True)
+    teacher_id = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all(), write_only=True, source='teacher')
+
+    section = SectionSerializer(read_only=True)
+    section_id = serializers.PrimaryKeyRelatedField(queryset=Section.objects.all(), write_only=True, source='section')
+
+    class Meta:
+        model = Schedule
+        fields = ['id', 'day', 'start_time', 'end_time', 'teacher', 'teacher_id', 'section', 'section_id']
+
+    def validate(self, data):
+        instance = self.instance
+
+        teacher = data.get('teacher', getattr(instance, 'teacher', None))
+        section = data.get('section', getattr(instance, 'section', None))
+        start_time = data.get('start_time', getattr(instance, 'start_time', None))
+        end_time = data.get('end_time', getattr(instance, 'end_time', None))
+        day = data.get('day', getattr(instance, 'day', None))
+
+        if not all([teacher, section, start_time, end_time, day]):
+            raise serializers.ValidationError("Missing required fields for validation.")
+
+        if start_time >= end_time:
+            raise serializers.ValidationError("End time must be after start time.")
+
+        teacher_conflicts = Schedule.objects.filter(
+            teacher=teacher,
+            day=day,
+            start_time__lt=end_time,
+            end_time__gt=start_time,
+        )
+        section_conflicts = Schedule.objects.filter(
+            section=section,
+            day=day,
+            start_time__lt=end_time,
+            end_time__gt=start_time,
+        )
+
+        if instance:
+            teacher_conflicts = teacher_conflicts.exclude(id=instance.id)
+            section_conflicts = section_conflicts.exclude(id=instance.id)
+
+        if teacher_conflicts.exists():
+            raise serializers.ValidationError("Teacher is already scheduled during this time.")
+
+        if section_conflicts.exists():
+            raise serializers.ValidationError("This section already has a teacher scheduled during this time.")
+
+        return data
 
 
 

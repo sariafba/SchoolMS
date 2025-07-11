@@ -42,4 +42,9 @@ class SectionView(ModelViewSet):
     filterset_fields = ['grade']
 
 
+class ScheduleView(ModelViewSet):
+    queryset = Schedule.objects.all()
+    serializer_class = ScheduleSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['teacher', 'section', 'day']
 

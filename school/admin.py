@@ -26,3 +26,8 @@ class GradeAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'grade']
     ordering = ['id']
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'teacher', 'section__name', 'day', 'start_time', 'end_time']
+    ordering = ['id']
