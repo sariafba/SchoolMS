@@ -31,3 +31,12 @@ class SectionAdmin(admin.ModelAdmin):
 class ScheduleAdmin(admin.ModelAdmin):
     list_display = ['id', 'teacher', 'section__name', 'day', 'start_time', 'end_time']
     ordering = ['id']
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user__username', 'text', 'created_at', 'updated_at']
+    ordering = ['id']
+
+@admin.register(Attachment)
+class AttachmentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'post', 'file', 'file_type']

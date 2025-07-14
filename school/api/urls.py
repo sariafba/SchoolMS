@@ -9,6 +9,7 @@ router.register('study-stages', StudyStageView)
 router.register('grades', GradeView)
 router.register('sections', SectionView)
 router.register('schedules', ScheduleView)
+router.register('posts', PostView)
 
 urlpatterns = [
     path('', include(router.urls)),

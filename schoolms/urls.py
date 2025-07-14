@@ -24,3 +24,7 @@ urlpatterns = [
     path('api/users/', include('users.api.urls')),
     path('api/school/', include('school.api.urls')),
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
