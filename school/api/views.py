@@ -64,3 +64,17 @@ class PostView(ModelViewSet):
             
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class PlacementDateView(ModelViewSet):
+    queryset = PlacementDate.objects.all()
+    serializer_class = PlacementDateSerializer
+    
+    def get_queryset(self):
+        queryset = PlacementDate.objects.all()
+        future_param = self.request.query_params.get('future')
+
+        if future_param and future_param.lower() in ['true', '1', 'yes']:
+            queryset = queryset.filter(date__gt=timezone.now())
+
+        return queryset
+

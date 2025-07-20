@@ -121,3 +121,6 @@ class Attachment(models.Model):
     def __str__(self):
         return f"{self.file_type} attachment for post {self.post.id}"
 
+class PlacementDate(models.Model):
+    date = models.DateTimeField()
+    

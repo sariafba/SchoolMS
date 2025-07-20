@@ -40,3 +40,8 @@ class PostAdmin(admin.ModelAdmin):
 @admin.register(Attachment)
 class AttachmentAdmin(admin.ModelAdmin):
     list_display = ['id', 'post', 'file', 'file_type']
+
+@admin.register(PlacementDate)
+class PlacementDateAdmin(admin.ModelAdmin):
+    list_display = ['id', 'date']
+    ordering = ['id']

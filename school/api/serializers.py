@@ -2,6 +2,7 @@ from rest_framework import serializers
 from school.models import *
 from users.models import Teacher
 from users.models import Employee
+import datetime
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -201,3 +202,12 @@ class PostSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
+
+class PlacementDateSerializer(serializers.ModelSerializer):
+    day_name = serializers.SerializerMethodField()
+    class Meta:
+        model = PlacementDate
+        fields = ['id', 'date', 'day_name']
+
+    def get_day_name(self, obj):
+        return obj.date.strftime('%A')
