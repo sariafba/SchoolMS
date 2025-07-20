@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-
+from school.permissions import IsSuperAdminAdminReceptionist
 
 class SubjectView(ModelViewSet):
     queryset = Subject.objects.all()
@@ -68,7 +68,8 @@ class PostView(ModelViewSet):
 class PlacementDateView(ModelViewSet):
     queryset = PlacementDate.objects.all()
     serializer_class = PlacementDateSerializer
-    
+    permission_classes = [IsSuperAdminAdminReceptionist]
+
     def get_queryset(self):
         queryset = PlacementDate.objects.all()
         future_param = self.request.query_params.get('future')
