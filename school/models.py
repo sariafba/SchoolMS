@@ -123,4 +123,9 @@ class Attachment(models.Model):
 
 class PlacementDate(models.Model):
     date = models.DateTimeField()
+    limit = models.IntegerField()
+
+class Placement(models.Model):
+    placement_date = models.ForeignKey(PlacementDate, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     

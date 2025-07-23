@@ -43,5 +43,5 @@ class AttachmentAdmin(admin.ModelAdmin):
 
 @admin.register(PlacementDate)
 class PlacementDateAdmin(admin.ModelAdmin):
-    list_display = ['id', 'date']
+    list_display = ['id', 'date', 'limit']
     ordering = ['id']

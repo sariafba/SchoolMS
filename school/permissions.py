@@ -2,12 +2,17 @@ from rest_framework.permissions import BasePermission
 
 class IsSuperAdminAdminReceptionist(BasePermission):
     """
+    Allow access for all if method GET 
     Allow access only to superuser or employees with role:
     - admin
     - receptionist
     """
 
     def has_permission(self, request, view):
+        # Allow any GET request
+        if request.method == 'GET':
+            return True
+        
         if not request.user.is_authenticated:
             return False
 

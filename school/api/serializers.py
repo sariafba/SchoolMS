@@ -204,10 +204,12 @@ class PostSerializer(serializers.ModelSerializer):
         return instance
 
 class PlacementDateSerializer(serializers.ModelSerializer):
+
     day_name = serializers.SerializerMethodField()
+    
     class Meta:
         model = PlacementDate
-        fields = ['id', 'date', 'day_name']
+        fields = ['id', 'date', 'limit', 'day_name']
 
     def get_day_name(self, obj):
         return obj.date.strftime('%A')
