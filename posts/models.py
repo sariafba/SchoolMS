@@ -8,6 +8,7 @@ from mimetypes import guess_type
 class Post(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='posts')
     text = models.TextField()
+    is_public = models.BooleanField(default=True)
     sections = models.ManyToManyField('school.Section', related_name='posts')
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

@@ -5,6 +5,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from posts.models import Post
 from rest_framework.response import Response
 from rest_framework import status
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
