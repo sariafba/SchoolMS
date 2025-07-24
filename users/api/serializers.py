@@ -1,7 +1,7 @@
 # serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from users.models import Employee, Teacher
+from users.models import Employee, Teacher, Card
 from django.db import transaction
 from school.models import Subject
 from school.api.serializers import SubjectSerializer
@@ -138,3 +138,4 @@ class EmployeeSerializer(serializers.ModelSerializer):
         if hasattr(obj, 'teacher'):
             return SubjectSerializer(obj.teacher.subjects.all(), many=True).data
         return []
+    

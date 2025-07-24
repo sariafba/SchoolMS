@@ -36,3 +36,8 @@ class ScheduleAdmin(admin.ModelAdmin):
 class PlacementDateAdmin(admin.ModelAdmin):
     list_display = ['id', 'date', 'limit']
     ordering = ['id']
+
+@admin.register(Placement)
+class PlacementAdmin(admin.ModelAdmin):
+    list_display = ['id', 'placement_date', 'placement_result', 'student_religion', 'student_card', 'parent1_card', 'parent1_job', 'parent2_card', 'parent2_job']
+    ordering = ['id']

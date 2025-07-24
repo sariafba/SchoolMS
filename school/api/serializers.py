@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from school.models import *
-from users.models import Teacher
-from users.models import Employee
+from users.models import Teacher, Employee, Card
 
 
 
@@ -134,3 +133,84 @@ class PlacementDateSerializer(serializers.ModelSerializer):
 
     def get_day_name(self, obj):
         return obj.date.strftime('%A')
+    
+class CardNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Card
+        fields = [
+            'first_name',
+            'last_name',
+            'phone',
+            'nationality',
+            'gender',
+            'birth_date',
+            'birth_city',
+            'address',
+            'place_of_register',
+            'national_no',
+        ]
+
+class PlacementSerializer(serializers.ModelSerializer):
+    # nested card serializers
+    student_card = CardNestedSerializer()
+    parent1_card = CardNestedSerializer()
+    parent2_card = CardNestedSerializer()
+
+    class Meta:
+        model = Placement
+        fields = [
+            'id',
+            'placement_date',
+            'placement_result',
+
+            'student_religion',
+            'student_card',
+
+            'parent1_job',
+            'parent1_card',
+
+            'parent2_job',
+            'parent2_card'
+        ]
+        read_only_fields = ['id']
+
+    def create(self, validated_data):
+        # Pop out nested card data
+        student_card_data    = validated_data.pop('student_card')
+        parent1_card_data      = validated_data.pop('parent1_card')
+        parent2_card_data      = validated_data.pop('parent2_card')
+
+        # Create Card instances
+        student_card_obj   = Card.objects.create(**student_card_data)
+        parent1_card_obj     = Card.objects.create(**parent1_card_data)
+        parent2_card_obj     = Card.objects.create(**parent2_card_data)
+
+        # Create Placement linking cards
+        placement = Placement.objects.create(
+            student_card=student_card_obj,
+            parent1_card=parent1_card_obj,
+            parent2_card=parent2_card_obj,
+            **validated_data
+        )
+        return placement
+
+    def update(self, instance, validated_data):
+        # Update simple fields
+        for attr in ['placement_date', 'placement_result', 'student_religion', 'parent1_job', 'parent2_job']:
+            if attr in validated_data:
+                setattr(instance, attr, validated_data.pop(attr))
+
+        # Helper to update nested card
+        def _update_card(field_name, card_instance):
+            card_data = validated_data.pop(field_name, None)
+            if card_data:
+                for key, val in card_data.items():
+                    setattr(card_instance, key, val)
+                card_instance.save()
+
+        _update_card('student_card', instance.student_card)
+        _update_card('parent1_card', instance.parent1_card)
+        _update_card('parent2_card', instance.parent2_card)
+
+        instance.save()
+        return instance

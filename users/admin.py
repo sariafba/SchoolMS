@@ -20,3 +20,8 @@ class TeacherAdmin(admin.ModelAdmin):
     def get_subjects(self, obj):
         return ", ".join([subject.name for subject in obj.subjects.all()])
     get_subjects.short_description = 'Subjects'
+
+@admin.register(Card)
+class Card(admin.ModelAdmin):
+    list_display = ['id', 'first_name', 'last_name', 'phone', 'nationality', 'gender', 'birth_date', 'birth_city', 'address', 'place_of_register', 'national_no']
+    ordering = ['id']

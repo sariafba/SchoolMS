@@ -34,20 +34,25 @@ class Teacher(models.Model):
     def __str__(self):
         return self.employee.user.username
 
-# class parent(models.Model):
+# class Parent(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parent')
-#     address = models.CharField(max_length=100)
-    
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
+#     job = models.CharField(max_length=100, blank=True, null=True)
 
 # class Student(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
-#     nationality = models.CharField(max_length=100)
-#     birth_date = models.DateField()
-#     birth_city = models.CharField(max_length=100)
-#     address = models.CharField(max_length=100)
-#     gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
+#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
 #     religion = models.CharField(max_length=20, choices=[('islam', 'Islam'),('christianity', 'Christianity'),('other', 'Other')])
-#     place_of_register = models.CharField(max_length=100)
-#     national_no = models.CharField(max_length=100)
-#     disabled = models.CharField(max_length=100)
+
+class Card(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=13)
+    nationality = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female')])
+    birth_date = models.DateField()
+    birth_city = models.CharField(max_length=100)
+    address = models.CharField(max_length=100, blank=True, null=True)
+    place_of_register = models.CharField(max_length=100)
+    national_no = models.CharField(max_length=100)
 
