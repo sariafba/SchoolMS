@@ -34,6 +34,7 @@ AUTH_USER_MODEL = 'users.User'
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,10 +54,20 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'school.apps.SchoolConfig',
     'core.apps.CoreConfig',
+    'posts.apps.PostsConfig',
 
     #
-    'corsheaders'
+    'corsheaders',
 ]
+
+#
+ASGI_APPLICATION = 'schoolms.asgi.application'
+ 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -70,7 +81,6 @@ MIDDLEWARE = [
 ]
 
 # DRF
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',    
@@ -80,7 +90,6 @@ REST_FRAMEWORK = {
 }
 
 # dj_rest_auth
-
 REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
@@ -97,7 +106,6 @@ SIMPLE_JWT = {
 }
 
 # CORS
-
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:5500",
@@ -109,7 +117,7 @@ import os
 MEDIA_URL = '/storage/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'storage')
 
-
+ASGI_APPLICATION = "schoolms.asgi.application"
 
 
 
@@ -131,7 +139,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'schoolms.wsgi.application'
 
 
 # Database

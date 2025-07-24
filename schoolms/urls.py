@@ -23,6 +23,7 @@ urlpatterns = [
     # API
     path('api/users/', include('users.api.urls')),
     path('api/school/', include('school.api.urls')),
+    path('api/posts/', include('posts.api.urls')),
 ]
 
 from django.conf import settings
