@@ -6,6 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from school.permissions import IsSuperAdminAdminReceptionist
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
+from school.filters import PlacementFilter
+
 
 class SubjectView(ModelViewSet):
     queryset = Subject.objects.all()
@@ -62,3 +64,6 @@ class PlacementView(ModelViewSet):
     queryset = Placement.objects.all()
     serializer_class = PlacementSerializer
     permission_classes = [IsAuthenticated]
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PlacementFilter
