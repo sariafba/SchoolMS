@@ -25,3 +25,8 @@ class TeacherAdmin(admin.ModelAdmin):
 class Card(admin.ModelAdmin):
     list_display = ['id', 'first_name', 'last_name', 'phone', 'nationality', 'gender', 'birth_date', 'birth_city', 'address', 'place_of_register', 'national_no']
     ordering = ['id']
+
+@admin.register(Student)
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['id']
+    ordering = ['id']

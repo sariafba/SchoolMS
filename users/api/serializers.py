@@ -1,10 +1,10 @@
 # serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from users.models import Employee, Teacher, Card
+from users.models import *
 from django.db import transaction
-from school.models import Subject
-from school.api.serializers import SubjectSerializer
+from school.models import Subject, Placement, Section
+from school.api.serializers import SubjectSerializer, SectionSerializer
 from dj_rest_auth.serializers import UserDetailsSerializer as BaseUserDetailsSerializer
 
 User = get_user_model()
@@ -138,4 +138,153 @@ class EmployeeSerializer(serializers.ModelSerializer):
         if hasattr(obj, 'teacher'):
             return SubjectSerializer(obj.teacher.subjects.all(), many=True).data
         return []
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']  # Only include username
+
+class CardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Card
+        fields = '__all__'
+
+class ParentSerializer(serializers.ModelSerializer):
+    card = CardSerializer()
+
+    class Meta:
+        model = Parent
+        fields = ['job', 'card']
+
+
+class StudentSerializer(serializers.ModelSerializer):
+
+    username  = serializers.CharField(write_only=True, required=False)
+    password  = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+
+    placement = serializers.PrimaryKeyRelatedField(
+        queryset=Placement.objects.all(),
+        write_only=True
+    )
+    section_id = serializers.PrimaryKeyRelatedField(
+        source='section',
+        queryset=Section.objects.all(),
+        write_only=True,
+        required=False
+    )
+    religion = serializers.ChoiceField(
+        choices=Student.RELIGION_CHOICES,  # Assuming you have this in your model
+        required=False
+    )
+    student_card = CardSerializer(write_only=True, required=False)
+
+    parent1_card = CardSerializer(write_only=True, required=False)
+    parent2_card = CardSerializer(write_only=True, required=False)
+
+    parent1_job = serializers.CharField(write_only=True, required=False)
+    parent2_job = serializers.CharField(write_only=True, required=False)
+
+    # read-only fields
+    user = SimpleUserSerializer(read_only=True)
+    card = CardSerializer(read_only=True)
+    parent1 = ParentSerializer(read_only=True)
+    parent2 = ParentSerializer(read_only=True)
+    section = SectionSerializer(read_only=True)
+
+    class Meta:
+        model = Student
+        fields = [
+            'id',
+            'user',
+            'username', 'password',
+            'placement',
+            'religion',
+            'student_card',
+            'parent1_card', 'parent2_card',
+            'parent1_job', 'parent2_job',
+            'card', 'parent1', 'parent2',
+            'section', 'section_id'
+        ]
+
+    def validate_placement(self, placement):
+        if placement.placement_result is not True:
+            raise serializers.ValidationError("Placement is not approved.")
+        return placement
     
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
+
+    @transaction.atomic
+    def create(self, validated_data):
+        placement = validated_data.pop('placement')
+        section   = validated_data.pop('section')
+        username  = validated_data.pop('username')
+        password  = validated_data.pop('password')
+
+        user = User.objects.create_user(username=username, password=password)
+
+        parent1 = Parent.objects.create(job=placement.parent1_job, card=placement.parent1_card)
+        parent2 = Parent.objects.create(job=placement.parent2_job, card=placement.parent2_card)
+
+        student = Student.objects.create(
+            user=user,
+            card=placement.student_card,
+            religion=placement.student_religion,
+            parent1=parent1,
+            parent2=parent2,
+            section=section
+        )
+
+        placement.delete()  # optional
+        return student
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        # 1. Update User
+        user = instance.user
+        username = validated_data.pop('username', None)
+        password = validated_data.pop('password', None)
+
+        if username:
+            user.username = username
+        if password:
+            user.set_password(password)
+        user.save()
+
+        # 2. Update Student.religion
+        if 'religion' in validated_data:
+            instance.religion = validated_data.pop('religion')
+            instance.save(update_fields=['religion'])
+
+        # 3. Update student card
+        student_card_data = validated_data.pop('student_card', None)
+        if student_card_data:
+            for field, value in student_card_data.items():
+                setattr(instance.card, field, value)
+            instance.card.save()
+
+        # 4. Update parent1 job & card
+        parent1_job = validated_data.pop('parent1_job', None)
+        if parent1_job:
+            instance.parent1.job = parent1_job
+        parent1_card_data = validated_data.pop('parent1_card', None)
+        if parent1_card_data:
+            for field, value in parent1_card_data.items():
+                setattr(instance.parent1.card, field, value)
+            instance.parent1.card.save()
+        instance.parent1.save()
+
+        # 5. Update parent2 job & card
+        parent2_job = validated_data.pop('parent2_job', None)
+        if parent2_job:
+            instance.parent2.job = parent2_job
+        parent2_card_data = validated_data.pop('parent2_card', None)
+        if parent2_card_data:
+            for field, value in parent2_card_data.items():
+                setattr(instance.parent2.card, field, value)
+            instance.parent2.card.save()
+        instance.parent2.save()
+
+        return instance

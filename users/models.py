@@ -34,15 +34,33 @@ class Teacher(models.Model):
     def __str__(self):
         return self.employee.user.username
 
-# class Parent(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='parent')
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     job = models.CharField(max_length=100, blank=True, null=True)
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
+    section = models.ForeignKey('school.Section', on_delete=models.CASCADE)
+    card = models.OneToOneField('Card', on_delete=models.CASCADE)  # permanent student card
+    religion = models.CharField(max_length=20, choices=[('islam', 'Islam'), ('christianity', 'Christianity'), ('other', 'Other')])
+    parent1 = models.OneToOneField('Parent', on_delete=models.CASCADE, related_name='parent1')
+    parent2 = models.OneToOneField('Parent', on_delete=models.CASCADE, related_name='parent2')
 
-# class Student(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
-#     card = models.ForeignKey('Card', on_delete=models.CASCADE)
-#     religion = models.CharField(max_length=20, choices=[('islam', 'Islam'),('christianity', 'Christianity'),('other', 'Other')])
+    def delete(self, *args, **kwargs):
+        self.parent1.delete()
+        self.parent2.delete()
+        self.card.delete()
+        super().delete(*args, **kwargs)
+
+    RELIGION_CHOICES = [
+        ('islam', 'Islam'),
+        ('christianity', 'Christianity'),
+        ('other', 'Other'),
+    ]
+
+class Parent(models.Model):
+    job = models.CharField(max_length=100)
+    card = models.OneToOneField('Card', on_delete=models.CASCADE)
+
+    def delete(self, *args, **kwargs):
+        self.card.delete()
+        super().delete(*args, **kwargs)
 
 class Card(models.Model):
     first_name = models.CharField(max_length=100)

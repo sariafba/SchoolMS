@@ -73,7 +73,7 @@ class PlacementDate(models.Model):
 
 class Placement(models.Model):
     placement_date = models.ForeignKey(PlacementDate, on_delete=models.CASCADE)
-    placement_result = models.BooleanField(null=True, blank=True)
+    placement_result = models.BooleanField(default=False, null=True, blank=True)
 
     student_religion = models.CharField(max_length=20, choices=[('islam', 'Islam'),('christianity', 'Christianity'),('other', 'Other')])
     student_card = models.ForeignKey('users.Card', on_delete=models.CASCADE, related_name='student_placements')
@@ -84,9 +84,9 @@ class Placement(models.Model):
     parent2_job = models.CharField(max_length=100)
     parent2_card = models.ForeignKey('users.Card', on_delete=models.CASCADE, related_name='parent2_placements')
 
-    def delete(self, *args, **kwargs):
-        self.student_card.delete()
-        self.parent1_card.delete()
-        self.parent2_card.delete()
-        super().delete(*args, **kwargs)
+    # def delete(self, *args, **kwargs):
+    #     self.student_card.delete()
+    #     self.parent1_card.delete()
+    #     self.parent2_card.delete()
+    #     super().delete(*args, **kwargs)
     

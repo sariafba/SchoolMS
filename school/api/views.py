@@ -2,7 +2,6 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import *
 from school.models import *
 from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework.filters import SearchFilter
 from school.permissions import IsSuperAdminAdminReceptionist
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
@@ -28,11 +27,7 @@ class GradeView(ModelViewSet):
     filterset_fields = [
         'study_stage',
         'study_year',
-        # 'study_stage__name': ['exact', 'icontains'],
-        # 'study_year__name': ['exact'],
           ]
-    # filter_backends = [SearchFilter]
-    # search_fields = ['name']
 
 class SectionView(ModelViewSet):
     queryset = Section.objects.all()

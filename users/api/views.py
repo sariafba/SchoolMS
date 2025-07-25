@@ -1,8 +1,8 @@
 # views.py
 from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
-from users.models import Employee
-from .serializers import EmployeeSerializer
+from users.models import Employee, Student
+from .serializers import EmployeeSerializer, StudentSerializer
 from users.permissions import EmployeePermission
 from rest_framework.response import Response
 from rest_framework import status
@@ -38,3 +38,8 @@ class EmployeeView(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         self.get_object().user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class StudentView(ModelViewSet):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    
