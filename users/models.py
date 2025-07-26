@@ -21,8 +21,8 @@ class Employee(models.Model):
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     contract_start = models.DateField()
     contract_end = models.DateField()
-    day_start = models.TimeField()
-    day_end = models.TimeField()
+    day_start = models.TimeField(null=True, blank=True)
+    day_end = models.TimeField(null=True, blank=True)
 
     def __str__(self):
         return self.user.username
