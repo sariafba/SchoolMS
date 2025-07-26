@@ -7,6 +7,7 @@ from mimetypes import guess_type
 
 class Post(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='posts')
+    title = models.CharField(max_length=100)
     text = models.TextField()
     is_public = models.BooleanField(default=True)
     sections = models.ManyToManyField('school.Section', related_name='posts')
@@ -59,3 +60,9 @@ class Attachment(models.Model):
     def __str__(self):
         return f"{self.file_type} attachment for post {self.post.id}"
     
+# class Comment(models.Model):
+    # post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    # user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='comments')
+    # text = models.TextField()
+    # created_at = models.DateTimeField(default=timezone.now)
+    # updated_at = models.DateTimeField(auto_now=True)
