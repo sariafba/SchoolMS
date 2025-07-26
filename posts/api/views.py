@@ -48,3 +48,19 @@ class PostView(ModelViewSet):
             
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class CommentView(ModelViewSet):
+    queryset = Comment.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = CommentSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        comment = self.get_object()
+        if comment.user != request.user:
+            return Response(
+                {"detail": "You may only delete your own comments."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
+
+

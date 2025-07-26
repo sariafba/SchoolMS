@@ -28,12 +28,24 @@ class PostSerializer(serializers.ModelSerializer):
         # allow_empty=False
     )
 
+    comments = serializers.SerializerMethodField(read_only=True)  # <-- here
+
     class Meta:
         model = Post
         fields = [
             'id', 'user', 'is_public', 'title', 'text', 'sections', 'section_ids',
-            'created_at', 'updated_at', 'attachments'
+            'created_at', 'updated_at', 'attachments', 'comments'
         ]
+
+    def get_comments(self, obj):
+        # Only top-level comments; each will serialize its own replies
+        qs = (obj.comments
+                .filter(comment__isnull=True)
+                .select_related('user')
+                .prefetch_related('replies__user'))
+        return CommentSerializer(qs, many=True, context=self.context).data
+
+  
 
     def validate(self, attrs):
         is_public = attrs.get('is_public', True)
@@ -100,3 +112,40 @@ class PostSerializer(serializers.ModelSerializer):
         
         return instance
     
+class CommentSerializer(serializers.ModelSerializer):
+    # Hide the user field on write, auto‑assign from request.user
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id',
+            'post',
+            'comment',   # parent comment (for replies)
+            'text',
+            'user',
+            'created_at',
+            'updated_at',
+        ]
+        extra_kwargs = {
+            'post': {'write_only': True},
+            'comment': {'write_only': True},
+        }
+
+    def update(self, instance, validated_data):
+        raise serializers.ValidationError("Comments cannot be updated.")
+
+    def to_representation(self, instance):
+        # On read, include nested user and replies if you like:
+        ret = super().to_representation(instance)
+        ret['user'] = {
+            'id': instance.user.id,
+            'username': instance.user.username,
+        }
+        # Optionally include replies:
+        ret['replies'] = CommentSerializer(
+            instance.replies.all(), many=True, context=self.context
+        ).data
+        return ret
