@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-class IsSuperAdminAdminReceptionist(BasePermission):
+class IsAdminCooperatorReceptionist(BasePermission):
     """
     Allow access for all if method GET 
     Allow access only to superuser or employees with role:
@@ -20,7 +20,7 @@ class IsSuperAdminAdminReceptionist(BasePermission):
             return True
 
         employee = getattr(request.user, 'employee', None)
-        if employee and employee.role in ['admin', 'receptionist']:
+        if employee and employee.role in ['admin', 'cooperator', 'receptionist']:
             return True
 
         return False

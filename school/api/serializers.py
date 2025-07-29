@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from school.models import *
 from users.models import Teacher, Employee, Card
-
+from django.db import transaction
+from rest_framework.response import Response
+from rest_framework import status
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -174,12 +176,22 @@ class PlacementSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id']
 
+    @transaction.atomic
     def create(self, validated_data):
         # Pop out nested card data
         student_card_data    = validated_data.pop('student_card')
         parent1_card_data      = validated_data.pop('parent1_card')
         parent2_card_data      = validated_data.pop('parent2_card')
 
+        # Check placement limit
+        # placement_date = validated_data['placement_date']
+        # current_count = Placement.objects.filter(placement_date=placement_date).count()
+        # if current_count >= placement_date.limit:
+        #     return Response(
+        #         {"detail": "Placement limit reached for this date."},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
+        
         # Create Card instances
         student_card_obj   = Card.objects.create(**student_card_data)
         parent1_card_obj     = Card.objects.create(**parent1_card_data)
@@ -194,6 +206,7 @@ class PlacementSerializer(serializers.ModelSerializer):
         )
         return placement
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         # Update simple fields
         for attr in ['placement_date', 'placement_result', 'student_religion', 'parent1_job', 'parent2_job']:
