@@ -91,6 +91,9 @@ class PlacementView(ModelViewSet):
             placement_date = PlacementDate.objects.get(id=placement_date_id)
         except PlacementDate.DoesNotExist:
             return Response({"placement_date": "Invalid placement_date ID."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if placement_date.date < timezone.now():
+            return Response({"detail": "Cannot create placements for a past date."}, status=status.HTTP_400_BAD_REQUEST)
 
         current_count = Placement.objects.filter(placement_date=placement_date).count()
         if current_count >= placement_date.limit:
