@@ -18,6 +18,21 @@ class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
 
+    father_name = models.CharField(max_length=100)
+    mother_name = models.CharField(max_length=100)
+    nationality = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=[
+        ('male', 'Male'),
+        ('female', 'Female')  
+    ])
+    address = models.CharField(max_length=100)
+    birth_date = models.DateField()
+    family_status = models.CharField(max_length=20, choices=[
+        ('married', 'Married'),
+        ('single', 'Single'),
+    ])
+    national_no = models.CharField(max_length=100)
+
     salary = models.DecimalField(max_digits=10, decimal_places=2)
     contract_start = models.DateField()
     contract_end = models.DateField()

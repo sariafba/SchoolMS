@@ -121,6 +121,16 @@ class Command(BaseCommand):
         self.reset_sequence(Employee)
         self.reset_sequence(Teacher)
 
+        common_fields = {
+        "father_name": "Ahmed",
+        "mother_name": "Marwan",
+        "nationality": "Egyptian",
+        "gender": "male",
+        "address": "Cairo",
+        "birth_date": "2000-01-01",
+        "family_status": "married",
+        "national_no": "1234567890",
+    }
 
         #1
         serializer = EmployeeSerializer(data={
@@ -132,6 +142,14 @@ class Command(BaseCommand):
             "last_name": "Marwan1"
         },
         "role": 'admin',
+        "father_name": "Ahmed1",
+        "mother_name": "Marwan1",
+        "nationality": "Egyptian",
+        "gender": "male",
+        "address": "Cairo",
+        "birth_date": "2000-01-01",
+        "family_status": "married",
+        "national_no": "1234567890",
         "salary": "15000.00",
         "contract_start": "2024-09-01",
         "contract_end": "2025-06-01",
@@ -151,6 +169,7 @@ class Command(BaseCommand):
             "last_name": "Marwan2"
         },
         "role": 'cooperator',
+        **common_fields,
         "salary": "5000.00",
         "contract_start": "2024-09-01",
         "contract_end": "2025-06-01",
@@ -170,6 +189,7 @@ class Command(BaseCommand):
             "last_name": "Marwan3"
         },
         "role": 'cooperator',
+        **common_fields,
         "salary": "3500.00",
         "contract_start": "2024-09-01",
         "contract_end": "2025-06-01",
@@ -189,6 +209,7 @@ class Command(BaseCommand):
             "last_name": "Marwan4"
         },
         "role": 'teacher',
+        **common_fields,
         "subjectIDs": [1], # Arabic
         "salary": "7000.00",
         "contract_start": "2024-09-01",
@@ -209,6 +230,7 @@ class Command(BaseCommand):
             "last_name": "Marwan5"
         },
         "role": 'teacher',
+        **common_fields,
         "subjectIDs": [2], # English
         "salary": "10000.00",
         "contract_start": "2024-09-01",
@@ -229,6 +251,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan6"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [3],  # French
             "salary": "9000.00",
             "contract_start": "2024-09-01",
@@ -249,6 +272,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan7"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [4],  # Mathematics
             "salary": "9500.00",
             "contract_start": "2024-09-01",
@@ -269,6 +293,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan8"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [5],  # Science
             "salary": "8900.00",
             "contract_start": "2024-09-01",
@@ -289,6 +314,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan09"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [9,10],  # History, Geography
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -309,6 +335,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan10"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [8],  # Religion
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -329,6 +356,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan11"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [11],  # Music
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -349,6 +377,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan12"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [12],  # Art
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -369,6 +398,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan13"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [6,7],  # Physics, chemistry
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -389,6 +419,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan14"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [12],  # Art
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -409,6 +440,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan15"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [4],  # Mathematics
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -429,6 +461,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan16"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [4],  # Mathematics
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -449,6 +482,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan17"
             },
             "role": 'teacher',
+            **common_fields,    
             "subjectIDs": [2],  # English
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -469,6 +503,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan18"
             },
             "role": 'teacher',
+            **common_fields,    
             "subjectIDs": [5],  # Science
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -489,6 +524,7 @@ class Command(BaseCommand):
                 "last_name": "Marwan19"
             },
             "role": 'teacher',
+            **common_fields,
             "subjectIDs": [11],  # Music
             "salary": "8700.00",
             "contract_start": "2024-09-01",
@@ -509,6 +545,7 @@ class Command(BaseCommand):
             "last_name": "Marwan20"
         },
         "role": 'receptionist',
+        **common_fields,
         "salary": "2000.00",
         "contract_start": "2024-09-01",
         "contract_end": "2025-06-01",
