@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import *
 from school.models import *
 from django_filters.rest_framework import DjangoFilterBackend
-from school.permissions import IsAdminCooperatorReceptionist
+from school.permissions import *
 from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from school.filters import PlacementFilter
@@ -12,18 +12,26 @@ from django.db.models import Count, F
 class SubjectView(ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
+    permission_classes = [IsAdminCooperator]
+
 
 class StudyYearView(ModelViewSet):
     queryset = StudyYear.objects.all()
     serializer_class = StudyYearSerializer
+    permission_classes = [IsAdminCooperator]
+
 
 class StudyStageView(ModelViewSet):
     queryset = StudyStage.objects.all()
     serializer_class = StudyStageSerializer
+    permission_classes = [IsAdminCooperator]
+
 
 class GradeView(ModelViewSet):
     queryset = Grade.objects.select_related('study_stage', 'study_year').all()
     serializer_class = GradeSerializer
+    permission_classes = [IsAdminCooperator]
+
     filter_backends = [DjangoFilterBackend]
     filterset_fields = [
         'study_stage',
@@ -33,18 +41,24 @@ class GradeView(ModelViewSet):
 class SectionView(ModelViewSet):
     queryset = Section.objects.all()
     serializer_class = SectionSerializer
+    permission_classes = [IsEmployee]
+
+
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['grade']
 
 class ScheduleView(ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
+    permission_classes = [IsEmployee]
+
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['teacher', 'section', 'day']
     
 class PlacementDateView(ModelViewSet):
     queryset = PlacementDate.objects.all()
     serializer_class = PlacementDateSerializer
+
     permission_classes = [IsAdminCooperatorReceptionist]
 
     def get_queryset(self):
