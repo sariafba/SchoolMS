@@ -6,6 +6,8 @@ from school.models import *
 from users.models import *
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
+from django.utils.timezone import make_aware
+from datetime import datetime
 
 
 class Command(BaseCommand):
@@ -110,6 +112,17 @@ class Command(BaseCommand):
         Subject.objects.create(name='Art')
         self.stdout.write(self.style.SUCCESS('✅ subjects seeded.'))
 
+        #seed placement-dates
+        self.stdout.write(self.style.WARNING('seeding placement-dates'))
+        PlacementDate.objects.all().delete()
+        self.reset_sequence(PlacementDate)
+        PlacementDate.objects.create(
+            date=make_aware(datetime(2025, 12, 1, 9, 30)), limit=10
+        )
+        PlacementDate.objects.create(
+            date=make_aware(datetime(2024, 12, 2, 10, 30)), limit=10
+        )
+        self.stdout.write(self.style.SUCCESS('✅ placement-dates seeded.'))
 
     def seed_users(self):
         #seed employees
