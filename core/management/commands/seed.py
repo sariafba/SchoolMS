@@ -1,13 +1,14 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
-from users.api.serializers import EmployeeSerializer
+from users.api.serializers import EmployeeSerializer, CreateStudentSerializer
 from school.models import *
 from users.models import *
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from django.utils.timezone import make_aware
 from datetime import datetime
+from .factories import StudentFactory
 
 
 class Command(BaseCommand):
@@ -125,6 +126,20 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('✅ placement-dates seeded.'))
 
     def seed_users(self):
+
+        #seed students
+        self.stdout.write(self.style.WARNING('seeding students'))
+        Student.objects.all().delete()
+        self.reset_sequence(User)
+        self.reset_sequence(Student)
+        self.reset_sequence(Parent)
+        self.reset_sequence(Card)
+
+        for _ in range(30):
+            StudentFactory()
+
+        self.stdout.write(self.style.SUCCESS('✅ students seeded.'))
+
         #seed employees
         self.stdout.write(self.style.WARNING('seeding employees'))
         User.objects.filter(

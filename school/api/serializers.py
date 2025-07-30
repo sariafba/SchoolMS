@@ -182,15 +182,6 @@ class PlacementSerializer(serializers.ModelSerializer):
         student_card_data    = validated_data.pop('student_card')
         parent1_card_data      = validated_data.pop('parent1_card')
         parent2_card_data      = validated_data.pop('parent2_card')
-
-        # Check placement limit
-        # placement_date = validated_data['placement_date']
-        # current_count = Placement.objects.filter(placement_date=placement_date).count()
-        # if current_count >= placement_date.limit:
-        #     return Response(
-        #         {"detail": "Placement limit reached for this date."},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
         
         # Create Card instances
         student_card_obj   = Card.objects.create(**student_card_data)

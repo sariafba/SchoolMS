@@ -164,25 +164,25 @@ class ParentSerializer(serializers.ModelSerializer):
         model = Parent
         fields = ['job', 'card']
 
-
 class StudentSerializer(serializers.ModelSerializer):
 
-    username  = serializers.CharField(write_only=True, required=False)
-    password  = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'})
+    username  = serializers.CharField(write_only=True, required=True)
+    password  = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
 
     placement = serializers.PrimaryKeyRelatedField(
         queryset=Placement.objects.all(),
-        write_only=True
+        write_only=True,
+        required = True
     )
     section_id = serializers.PrimaryKeyRelatedField(
         source='section',
         queryset=Section.objects.all(),
         write_only=True,
-        required=False
+        required=True
     )
     religion = serializers.ChoiceField(
         choices=Student.RELIGION_CHOICES,  # Assuming you have this in your model
-        required=False
+        required=True
     )
     student_card = CardSerializer(write_only=True, required=False)
 
@@ -206,6 +206,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'user',
             'username', 'password',
             'placement',
+            'register_date',
             'religion',
             'student_card',
             'parent1_card', 'parent2_card',
@@ -266,6 +267,11 @@ class StudentSerializer(serializers.ModelSerializer):
             instance.religion = validated_data.pop('religion')
             instance.save(update_fields=['religion'])
 
+        # Update Student.section
+        if 'section' in validated_data:
+            instance.section = validated_data.pop('section')
+            instance.save(update_fields=['section'])
+
         # 3. Update student card
         student_card_data = validated_data.pop('student_card', None)
         if student_card_data:
@@ -296,3 +302,89 @@ class StudentSerializer(serializers.ModelSerializer):
         instance.parent2.save()
 
         return instance
+    
+class CreateStudentSerializer(serializers.ModelSerializer):
+    # User creation fields (nested)
+    user = serializers.SerializerMethodField(read_only=True)  # For response
+    username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    
+    # Student card (nested)
+    card = CardSerializer()
+    
+    # Parents data (flat structure for job + nested cards)
+    parent1_job = serializers.CharField(write_only=True)
+    parent1_card = CardSerializer(write_only=True)
+    parent2_job = serializers.CharField(write_only=True)
+    parent2_card = CardSerializer(write_only=True)
+    
+    # Section (ID only)
+    section_id = serializers.PrimaryKeyRelatedField(
+        queryset=Section.objects.all(), 
+        write_only=True,
+        source='section',
+        required=True
+    )
+    section = SectionSerializer(read_only=True)  # For response
+    
+    class Meta:
+        model = Student
+        fields = [
+            'id',
+            'user',
+            'username',
+            'password',
+            'register_date',
+            'religion',
+            'card',
+            'section_id',
+            'section',
+            'parent1_job',
+            'parent1_card',
+            'parent2_job',
+            'parent2_card',
+        ]
+        read_only_fields = ['id', 'user', 'register_date', 'section']
+
+    def get_user(self, obj):
+        return SimpleUserSerializer(obj.user).data
+    
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
+
+    @transaction.atomic
+    def create(self, validated_data):
+        # Create User
+        user = User.objects.create_user(
+            username=validated_data.pop('username'),
+            password=validated_data.pop('password')
+        )
+        
+        # Create Student Card
+        card_data = validated_data.pop('card')
+        student_card = Card.objects.create(**card_data)
+        
+        # Create Parent 1
+        parent1_job = validated_data.pop('parent1_job')
+        parent1_card_data = validated_data.pop('parent1_card')
+        parent1_card = Card.objects.create(**parent1_card_data)
+        parent1 = Parent.objects.create(job=parent1_job, card=parent1_card)
+        
+        # Create Parent 2
+        parent2_job = validated_data.pop('parent2_job')
+        parent2_card_data = validated_data.pop('parent2_card')
+        parent2_card = Card.objects.create(**parent2_card_data)
+        parent2 = Parent.objects.create(job=parent2_job, card=parent2_card)
+        
+        # Create Student
+        student = Student.objects.create(
+            user=user,
+            card=student_card,
+            parent1=parent1,
+            parent2=parent2,
+            **validated_data  # religion + section
+        )
+        
+        return student

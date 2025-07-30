@@ -51,16 +51,22 @@ class Teacher(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
+    register_date = models.DateField(auto_now_add=True)
     section = models.ForeignKey('school.Section', on_delete=models.CASCADE)
-    card = models.OneToOneField('Card', on_delete=models.CASCADE)  # permanent student card
+    card = models.OneToOneField('Card', on_delete=models.CASCADE)
     religion = models.CharField(max_length=20, choices=[('islam', 'Islam'), ('christianity', 'Christianity'), ('other', 'Other')])
     parent1 = models.OneToOneField('Parent', on_delete=models.CASCADE, related_name='parent1')
     parent2 = models.OneToOneField('Parent', on_delete=models.CASCADE, related_name='parent2')
 
     def delete(self, *args, **kwargs):
-        self.parent1.delete()
-        self.parent2.delete()
-        self.card.delete()
+        if self.user:
+            self.user.delete()
+        if self.card:
+            self.card.delete()
+        if self.parent1:
+            self.parent1.delete()
+        if self.parent2:
+            self.parent2.delete()
         super().delete(*args, **kwargs)
 
     RELIGION_CHOICES = [
@@ -74,7 +80,8 @@ class Parent(models.Model):
     card = models.OneToOneField('Card', on_delete=models.CASCADE)
 
     def delete(self, *args, **kwargs):
-        self.card.delete()
+        if self.card:
+            self.card.delete()
         super().delete(*args, **kwargs)
 
 class Card(models.Model):

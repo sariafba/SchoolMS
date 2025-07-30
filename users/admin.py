@@ -28,5 +28,5 @@ class Card(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['id']
+    list_display = ['id','user__username', 'section__grade__name', 'section__name', 'register_date']
     ordering = ['id']

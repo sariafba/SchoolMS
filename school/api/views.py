@@ -59,7 +59,7 @@ class PlacementDateView(ModelViewSet):
     queryset = PlacementDate.objects.all()
     serializer_class = PlacementDateSerializer
 
-    permission_classes = [IsAdminCooperatorReceptionist]
+    permission_classes = [PlacementDatePermission]
 
     def get_queryset(self):
         queryset = PlacementDate.objects.all()

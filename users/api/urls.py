@@ -12,6 +12,7 @@ urlpatterns = [
     path('auth/', include('dj_rest_auth.urls')),
 
     # router
+    path('students/direct-store', CreateStudentView.as_view(), name='direct-store-student'),
     path('', include(router.urls)),
     
 ]
