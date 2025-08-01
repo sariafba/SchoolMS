@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
     
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user__username', 'role', 'salary', 'contract_start', 'contract_end', 'day_start', 'day_end']
+    list_display = ['id', 'user__username', 'role', 'salary', 'user__phone', 'contract_start', 'contract_end', 'day_start', 'day_end']
     ordering = ['id']
 
 @admin.register(Teacher)

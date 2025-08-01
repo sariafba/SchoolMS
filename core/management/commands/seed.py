@@ -1,14 +1,14 @@
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
-from users.api.serializers import EmployeeSerializer, CreateStudentSerializer
+from users.api.serializers import EmployeeSerializer
 from school.models import *
 from users.models import *
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from django.utils.timezone import make_aware
 from datetime import datetime
-from .factories import StudentFactory
+from .factories import StudentFactory, TeacherFactory
 
 
 class Command(BaseCommand):
@@ -202,28 +202,63 @@ class Command(BaseCommand):
 
     def seed_users(self):
 
+        User.objects.all().delete()
+
+        User.objects.create_superuser(
+            username='superadmin',
+            password='password',
+        )
+
         '''
         seeding students
         '''
         self.stdout.write(self.style.WARNING('seeding students'))
-        Student.objects.all().delete()
-        self.reset_sequence(User)
+        Parent.objects.all().delete()
+        Card.objects.all().delete()
         self.reset_sequence(Student)
         self.reset_sequence(Parent)
         self.reset_sequence(Card)
 
-        for _ in range(30):
-            StudentFactory()
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=1))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=2))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=3))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=4))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=5))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=6))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=7))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=8))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=9))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=10))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=11))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=12))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=13))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=14))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=15))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=16))
 
         self.stdout.write(self.style.SUCCESS('✅ students seeded.'))
 
         '''
         seeding employee 
         '''
+
         self.stdout.write(self.style.WARNING('seeding employees'))
-        User.objects.filter(
-            Q(username__icontains='ahmed')
-        ).delete()
         self.reset_sequence(User)
         self.reset_sequence(Employee)
         self.reset_sequence(Teacher)
@@ -312,344 +347,8 @@ class Command(BaseCommand):
             "username": "ahmed04",
             "password": "password",
             "phone": "0900000004",
-            "first_name": "Ahmed4",
-            "last_name": "Marwan4"
-        },
-        "role": 'teacher',
-        **common_fields,
-        "subjectIDs": [1], # Arabic
-        "salary": "7000.00",
-        "contract_start": "2024-09-01",
-        "contract_end": "2025-06-01",
-        "day_start": "08:00:00",
-        "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-    
-        #5
-        serializer = EmployeeSerializer(data={
-        "user": {
-            "username": "ahmed05",
-            "password": "password",
-            "phone": "0900000005",
-            "first_name": "Ahmed5",
-            "last_name": "Marwan5"
-        },
-        "role": 'teacher',
-        **common_fields,
-        "subjectIDs": [2], # English
-        "salary": "10000.00",
-        "contract_start": "2024-09-01",
-        "contract_end": "2025-06-01",
-        "day_start": "08:00:00",
-        "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #6
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed06",
-                "password": "password",
-                "phone": "0900000006",
-                "first_name": "Ahmed6",
-                "last_name": "Marwan6"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [3],  # French
-            "salary": "9000.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #7
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed07",
-                "password": "password",
-                "phone": "0900000007",
-                "first_name": "Ahmed7",
-                "last_name": "Marwan7"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [4],  # Mathematics
-            "salary": "9500.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #8
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed08",
-                "password": "password",
-                "phone": "0900000008",
-                "first_name": "Ahmed8",
-                "last_name": "Marwan8"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [5],  # Science
-            "salary": "8900.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #9
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed09",
-                "password": "password",
-                "phone": "0900000009",
-                "first_name": "Ahmed09",
-                "last_name": "Marwan09"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [9,10],  # History, Geography
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #10
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed10",
-                "password": "password",
-                "phone": "0900000010",
-                "first_name": "Ahmed10",
-                "last_name": "Marwan10"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [8],  # Religion
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #11
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed11",
-                "password": "password",
-                "phone": "0900000011",
-                "first_name": "Ahmed11",
-                "last_name": "Marwan11"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [11],  # Music
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #12
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed12",
-                "password": "password",
-                "phone": "0900000012",
-                "first_name": "Ahmed12",
-                "last_name": "Marwan12"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [12],  # Art
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-        
-        #13
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed13",
-                "password": "password",
-                "phone": "0900000013",
-                "first_name": "Ahmed13",
-                "last_name": "Marwan13"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [6,7],  # Physics, chemistry
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #14
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed14",
-                "password": "password",
-                "phone": "0900000014",
-                "first_name": "Ahmed14",
-                "last_name": "Marwan14"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [12],  # Art
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #15
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed15",
-                "password": "password",
-                "phone": "0900000015",
-                "first_name": "Ahmed15",
-                "last_name": "Marwan15"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [4],  # Mathematics
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-        
-        #16
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed16",
-                "password": "password",
-                "phone": "0900000016",
-                "first_name": "Ahmed16",
-                "last_name": "Marwan16"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [4],  # Mathematics
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #17
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed17",
-                "password": "password",
-                "phone": "0900000017",
-                "first_name": "Ahmed17",
-                "last_name": "Marwan17"
-            },
-            "role": 'teacher',
-            **common_fields,    
-            "subjectIDs": [2],  # English
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #18
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed18",
-                "password": "password",
-                "phone": "0900000018",
-                "first_name": "Ahmed18",
-                "last_name": "Marwan18"
-            },
-            "role": 'teacher',
-            **common_fields,    
-            "subjectIDs": [5],  # Science
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #19
-        serializer = EmployeeSerializer(data={
-            "user": {
-                "username": "ahmed19",
-                "password": "password",
-                "phone": "0900000019",
-                "first_name": "Ahmed19",
-                "last_name": "Marwan19"
-            },
-            "role": 'teacher',
-            **common_fields,
-            "subjectIDs": [11],  # Music
-            "salary": "8700.00",
-            "contract_start": "2024-09-01",
-            "contract_end": "2025-06-01",
-            "day_start": "08:00:00",
-            "day_end": "13:15:00"
-        }, context={'request': Request(APIRequestFactory().post('/'))})
-        if serializer.is_valid():
-            serializer.save()
-
-        #20
-        serializer = EmployeeSerializer(data={
-        "user": {
-            "username": "ahmed20",
-            "password": "password",
-            "phone": "0900000020",
-            "first_name": "Ahmed20",
-            "last_name": "Marwan20"
+            "first_name": "Ahmed04",
+            "last_name": "Marwan04"
         },
         "role": 'receptionist',
         **common_fields,
@@ -662,10 +361,103 @@ class Command(BaseCommand):
         if serializer.is_valid():
             serializer.save()
 
+        self.seed_teachers()
+
+
         self.stdout.write(self.style.SUCCESS('✅ employees seeded.'))
 
 
 
+        # self.seed_schedule()
+
+    def seed_teachers(self):
+        self.stdout.write(self.style.WARNING('seeding teachers...'))
+        
+        # KG1 Teachers
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Arabic', grade__name='KG1'),
+            Subject.objects.get(name='Mathematics', grade__name='KG1'),
+            Subject.objects.get(name='Science', grade__name='KG1'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='English', grade__name='KG1'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Religion', grade__name='KG1'),
+            Subject.objects.get(name='Music', grade__name='KG1'),
+            Subject.objects.get(name='Art', grade__name='KG1'),
+        ])
+        
+        # KG2 Teachers (same pattern as KG1)
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Arabic', grade__name='KG2'),
+            Subject.objects.get(name='Mathematics', grade__name='KG2'),
+            Subject.objects.get(name='Science', grade__name='KG2'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='English', grade__name='KG2'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Religion', grade__name='KG2'),
+            Subject.objects.get(name='Music', grade__name='KG2'),
+            Subject.objects.get(name='Art', grade__name='KG2'),
+        ])
+        
+        # Grade 1-5 Teachers (same core subjects)
+        for grade_num in range(1, 6):
+            grade_name = f'Grade {grade_num}'
+            
+            TeacherFactory(subjects=[
+                Subject.objects.get(name='Arabic', grade__name=grade_name),
+                Subject.objects.get(name='Mathematics', grade__name=grade_name),
+                Subject.objects.get(name='Science', grade__name=grade_name),
+            ])
+            
+            TeacherFactory(subjects=[
+                Subject.objects.get(name='English', grade__name=grade_name),
+            ])
+            
+            TeacherFactory(subjects=[
+                Subject.objects.get(name='Religion', grade__name=grade_name),
+                Subject.objects.get(name='Music', grade__name=grade_name),
+                Subject.objects.get(name='Art', grade__name=grade_name),
+            ])
+        
+        # Grade 6 Teachers (additional subjects)
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Arabic', grade__name='Grade 6'),
+            Subject.objects.get(name='History', grade__name='Grade 6'),
+            Subject.objects.get(name='Geography', grade__name='Grade 6'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='English', grade__name='Grade 6'),
+            Subject.objects.get(name='French', grade__name='Grade 6'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Mathematics', grade__name='Grade 6'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Science', grade__name='Grade 6'),
+            Subject.objects.get(name='Physics', grade__name='Grade 6'),
+            Subject.objects.get(name='Chemistry', grade__name='Grade 6'),
+        ])
+        
+        TeacherFactory(subjects=[
+            Subject.objects.get(name='Religion', grade__name='Grade 6'),
+            Subject.objects.get(name='Music', grade__name='Grade 6'),
+            Subject.objects.get(name='Art', grade__name='Grade 6'),
+        ])
+
+        self.stdout.write(self.style.SUCCESS('✅ teachers seeded'))
+
+    def seed_schedule(self):
         ''' 
         -- seed schedule
         '''
@@ -761,6 +553,3 @@ class Command(BaseCommand):
         table_name = model._meta.db_table
         with connection.cursor() as cursor:
             cursor.execute(f'DELETE FROM sqlite_sequence WHERE name="{table_name}";')
-
-
-        
