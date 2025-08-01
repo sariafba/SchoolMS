@@ -17,7 +17,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--app', type=str, help='App name to seed (e.g. users, school)')
 
-
     def handle(self, *args, **options):
 
         if options['app']:
@@ -35,9 +34,12 @@ class Command(BaseCommand):
 
 
 
+
     def seed_school(self):
 
-        # seed study years
+        '''
+        -- seed study years
+        '''
         self.stdout.write(self.style.WARNING('seeding study years...'))
         StudyYear.objects.all().delete()
         self.reset_sequence(StudyYear)
@@ -48,7 +50,9 @@ class Command(BaseCommand):
         StudyYear.objects.create(name='2024/2025')
         self.stdout.write(self.style.SUCCESS('✅ study years seeded.'))
 
-        # seed study stages
+        '''
+        -- seed study stages
+        '''
         self.stdout.write(self.style.WARNING('seeding study stages...'))
         StudyStage.objects.all().delete()
         self.reset_sequence(StudyStage)
@@ -56,8 +60,9 @@ class Command(BaseCommand):
         StudyStage.objects.create(name='elementary')
         self.stdout.write(self.style.SUCCESS('✅ study stages seeded.'))
 
-
-        #seed grades
+        '''
+        -- seed grades
+        '''
         self.stdout.write(self.style.WARNING('seeding grades...'))
         Grade.objects.all().delete()
         self.reset_sequence(Grade)
@@ -72,7 +77,9 @@ class Command(BaseCommand):
         Grade.objects.create(name='Grade 6', study_stage=StudyStage.objects.get(name='elementary'), study_year=StudyYear.objects.get(name='2020/2021'))
         self.stdout.write(self.style.SUCCESS('✅ grades seeded.'))
 
-        #seed sections
+        '''
+        -- seed sections
+        '''
         self.stdout.write(self.style.WARNING('seeding sections...'))
         Section.objects.all().delete()
         self.reset_sequence(Section)
@@ -95,25 +102,93 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('✅ sections seeded.'))
 
 
-        # seed subjects
+        ''' 
+        --  seed subjects
+        '''
         self.stdout.write(self.style.WARNING('seeding subjects...'))
         Subject.objects.all().delete()
         self.reset_sequence(Subject)
-        Subject.objects.create(name='Arabic')
-        Subject.objects.create(name='English')
-        Subject.objects.create(name='French')
-        Subject.objects.create(name='Mathematics')
-        Subject.objects.create(name='Science')
-        Subject.objects.create(name='Physics')
-        Subject.objects.create(name='Chemistry')
-        Subject.objects.create(name='Religion')
-        Subject.objects.create(name='History')
-        Subject.objects.create(name='Geography')
-        Subject.objects.create(name='Music')
-        Subject.objects.create(name='Art')
+        # KG1
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='KG1'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='KG1'))
+        
+        # KG2
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='KG2'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='KG2'))
+        
+        # Grade 1
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 1'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 1'))
+        
+        # Grade 2
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 2'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 2'))
+        
+        # Grade 3
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 3'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 3'))
+        
+        # Grade 4
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 4'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 4'))
+        
+        # Grade 5
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 5'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 5'))
+        
+        # Grade 6
+        Subject.objects.create(name='Arabic', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='English', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='French', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Mathematics', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Science', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Physics', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Chemistry', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Religion', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='History', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Geography', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Music', grade=Grade.objects.get(name='Grade 6'))
+        Subject.objects.create(name='Art', grade=Grade.objects.get(name='Grade 6'))
         self.stdout.write(self.style.SUCCESS('✅ subjects seeded.'))
 
-        #seed placement-dates
+        ''' 
+        -- seed placement-dates
+        '''
         self.stdout.write(self.style.WARNING('seeding placement-dates'))
         PlacementDate.objects.all().delete()
         self.reset_sequence(PlacementDate)
@@ -127,7 +202,9 @@ class Command(BaseCommand):
 
     def seed_users(self):
 
-        #seed students
+        '''
+        seeding students
+        '''
         self.stdout.write(self.style.WARNING('seeding students'))
         Student.objects.all().delete()
         self.reset_sequence(User)
@@ -140,7 +217,9 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS('✅ students seeded.'))
 
-        #seed employees
+        '''
+        seeding employee 
+        '''
         self.stdout.write(self.style.WARNING('seeding employees'))
         User.objects.filter(
             Q(username__icontains='ahmed')
@@ -587,7 +666,9 @@ class Command(BaseCommand):
 
 
 
-        #seed schedule
+        ''' 
+        -- seed schedule
+        '''
         self.stdout.write(self.style.WARNING('seeding schedules'))
         Schedule.objects.all().delete()
         self.reset_sequence(Schedule)
@@ -674,11 +755,6 @@ class Command(BaseCommand):
                             self.stdout.write(self.style.ERROR(f'Section {section_name} for {grade_name} not found'))
         
         self.stdout.write(self.style.SUCCESS('✅ Schedule seeded'))
-
-        
-
-
-
 
     def reset_sequence(self, model):
         """Reset SQLite auto-increment counter for a model"""

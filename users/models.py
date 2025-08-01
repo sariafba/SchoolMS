@@ -47,7 +47,8 @@ class Teacher(models.Model):
     subjects = models.ManyToManyField(Subject, related_name='teachers')
 
     def __str__(self):
-        return self.employee.user.username
+        user = self.employee.user
+        return user.first_name + ' ' + user.last_name
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')

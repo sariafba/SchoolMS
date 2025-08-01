@@ -4,7 +4,13 @@ from django.core.validators import RegexValidator
 
 
 class Subject(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
+    grade = models.ForeignKey('Grade', on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'grade'], name='unique_grade_name_per_subject')
+        ]
 
 class StudyYear(models.Model):
     name = models.CharField(

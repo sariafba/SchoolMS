@@ -6,10 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-class SubjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Subject
-        fields = '__all__'
+
 
 class StudyYearSerializer(serializers.ModelSerializer):
     class Meta:
@@ -47,6 +44,22 @@ class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
         fields = ['id', 'name', 'study_stage_id', 'study_stage', 'study_year_id', 'study_year']
+
+class SubjectSerializer(serializers.ModelSerializer):
+    grade = serializers.SerializerMethodField('get_grade')
+    teacher = serializers.SerializerMethodField('get_teacher')
+    grade_id = serializers.PrimaryKeyRelatedField(
+        queryset=Grade.objects.all(), write_only=True, source='grade'
+    )
+    class Meta:
+        model = Subject
+        fields = '__all__'
+
+    def get_grade(self, obj):
+        return obj.grade.name
+
+    def get_teacher(self, obj):
+        return [str(teacher) for teacher in obj.teachers.all()]
 
 class SectionSerializer(serializers.ModelSerializer):
     
