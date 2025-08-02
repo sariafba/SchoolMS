@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'school.apps.SchoolConfig',
     'core.apps.CoreConfig',
     'posts.apps.PostsConfig',
+    'landingpage.apps.LandingpageConfig',
 
     #
     'corsheaders',
