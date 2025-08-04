@@ -8,7 +8,8 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from django.utils.timezone import make_aware
 from datetime import datetime
-from .factories import StudentFactory, TeacherFactory
+from .factories import StudentFactory, TeacherFactory, ChatRoomFactory
+from chat.models import *
 
 
 class Command(BaseCommand):
@@ -210,51 +211,6 @@ class Command(BaseCommand):
         )
 
         '''
-        seeding students
-        '''
-        self.stdout.write(self.style.WARNING('seeding students'))
-        Parent.objects.all().delete()
-        Card.objects.all().delete()
-        self.reset_sequence(Student)
-        self.reset_sequence(Parent)
-        self.reset_sequence(Card)
-
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=1))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=2))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=3))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=4))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=5))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=6))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=7))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=8))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=9))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=10))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=11))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=12))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=13))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=14))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=15))
-        for _ in range(5):
-            StudentFactory(section = Section.objects.get(id=16))
-
-        self.stdout.write(self.style.SUCCESS('✅ students seeded.'))
-
-        '''
         seeding employee 
         '''
 
@@ -363,12 +319,59 @@ class Command(BaseCommand):
 
         self.seed_teachers()
 
-
         self.stdout.write(self.style.SUCCESS('✅ employees seeded.'))
 
 
+        '''
+        seeding students
+        '''
+        self.stdout.write(self.style.WARNING('seeding students'))
+        Parent.objects.all().delete()
+        Card.objects.all().delete()
+        self.reset_sequence(Student)
+        self.reset_sequence(Parent)
+        self.reset_sequence(Card)
+        #chat 
+        ChatRoom.objects.all().delete()
+        Message.objects.all().delete()
+        self.reset_sequence(ChatRoom)
+        self.reset_sequence(Message)
 
-        # self.seed_schedule()
+
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=1))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=2))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=3))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=4))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=5))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=6))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=7))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=8))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=9))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=10))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=11))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=12))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=13))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=14))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=15))
+        for _ in range(5):
+            StudentFactory(section = Section.objects.get(id=16))
+
+        self.stdout.write(self.style.SUCCESS('✅ students seeded.'))
 
     def seed_teachers(self):
         self.stdout.write(self.style.WARNING('seeding teachers...'))

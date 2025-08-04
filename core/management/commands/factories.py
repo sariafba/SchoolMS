@@ -2,6 +2,7 @@ import factory
 from faker import Faker
 from users.models import Card, Student, User, Parent, Employee, Teacher
 from school.models import Section, Subject
+from chat.models import ChatRoom
 import random
 
 fake = Faker()
@@ -107,5 +108,4 @@ class TeacherFactory(factory.django.DjangoModelFactory):
             # Otherwise, randomly assign some subjects
             subjects = Subject.objects.order_by('?')[:2]  # pick 2 random subjects
             self.subjects.set(subjects)
-
 
