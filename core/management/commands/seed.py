@@ -8,7 +8,7 @@ from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
 from django.utils.timezone import make_aware
 from datetime import datetime
-from .factories import StudentFactory, TeacherFactory, ChatRoomFactory
+from .factories import StudentFactory, TeacherFactory
 from chat.models import *
 
 
