@@ -70,7 +70,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['id', 'name', 'grade_id', 'grade']
+        fields = ['id', 'name', 'limit', 'grade_id', 'grade']
 
 class EmployeeSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()

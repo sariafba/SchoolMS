@@ -19,14 +19,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 class CustomUserDetailsSerializer(BaseUserDetailsSerializer):
     role = serializers.SerializerMethodField()
+    entity = serializers.SerializerMethodField()
 
     def get_role(self, obj):
         if hasattr(obj, 'employee'):
             return obj.employee.role
         return None
+    
+    def get_entity(self,obj):
+        if hasattr(obj, 'employee'):
+            return EmployeeSerializer(obj.employee).data
+        elif hasattr(obj, 'student'): 
+            return StudentSerializer(obj.student).data
+        return None
+
 
     class Meta(BaseUserDetailsSerializer.Meta):
-        fields = BaseUserDetailsSerializer.Meta.fields + ('role',)
+        fields = BaseUserDetailsSerializer.Meta.fields + ('role', 'entity')
 
 class EmployeeSerializer(serializers.ModelSerializer):
 

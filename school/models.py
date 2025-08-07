@@ -48,6 +48,7 @@ class Grade(models.Model):
 
 class Section(models.Model):
     name = models.CharField(max_length=100)
+    limit = models.IntegerField()
     grade = models.ForeignKey('Grade', on_delete=models.CASCADE)
 
     class Meta:

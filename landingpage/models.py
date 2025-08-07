@@ -19,7 +19,7 @@ class Activity(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to=upload_to)
-    videos = models.ManyToManyField('Video', related_name='activities', blank=True, null=True)
+    videos = models.ManyToManyField('Video', related_name='activities')
     details = models.CharField(max_length=100, blank=True, null=True)
 
 class Video(models.Model):
