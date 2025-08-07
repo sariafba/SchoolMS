@@ -53,7 +53,7 @@ class Teacher(models.Model):
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student')
     register_date = models.DateField(auto_now_add=True)
-    section = models.ForeignKey('school.Section', on_delete=models.CASCADE)
+    section = models.ForeignKey('school.Section', on_delete=models.CASCADE, related_name='students')
     card = models.OneToOneField('Card', on_delete=models.CASCADE)
     religion = models.CharField(max_length=20, choices=[('islam', 'Islam'), ('christianity', 'Christianity'), ('other', 'Other')])
     parent1 = models.OneToOneField('Parent', on_delete=models.CASCADE, related_name='parent1')

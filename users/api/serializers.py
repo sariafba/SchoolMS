@@ -191,7 +191,7 @@ class StudentSerializer(serializers.ModelSerializer):
     )
     religion = serializers.ChoiceField(
         choices=Student.RELIGION_CHOICES,  # Assuming you have this in your model
-        required=True
+        required=False
     )
     student_card = CardSerializer(write_only=True, required=False)
 
@@ -233,6 +233,11 @@ class StudentSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("A user with this username already exists.")
         return value
+    
+    def validate_section_id(self, section):
+        if section.students.count() >= section.limit:
+            raise serializers.ValidationError("This section has reached its student limit.")
+        return section
 
     @transaction.atomic
     def create(self, validated_data):
@@ -362,6 +367,11 @@ class CreateStudentSerializer(serializers.ModelSerializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("A user with this username already exists.")
         return value
+    
+    def validate_section_id(self, section):
+        if section.students.count() >= section.limit:
+            raise serializers.ValidationError("This section has reached its student limit.")
+        return section
 
     @transaction.atomic
     def create(self, validated_data):
