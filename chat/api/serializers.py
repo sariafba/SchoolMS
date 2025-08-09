@@ -61,12 +61,13 @@ class MessageSerializer(serializers.ModelSerializer):
 class GroupRoomSerializer(serializers.ModelSerializer):
     students = serializers.SerializerMethodField(read_only=True)
     employees = serializers.SerializerMethodField(read_only=True)
+    owner = serializers.SerializerMethodField(read_only=True)
 
     student_ids = serializers.PrimaryKeyRelatedField(
         queryset=Student.objects.all(),
         many=True,
         write_only=True,
-        source='student'
+        source='students'
     )
     employee_ids = serializers.PrimaryKeyRelatedField(
         queryset=Employee.objects.all(),
@@ -90,7 +91,7 @@ class GroupRoomSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        students = validated_data.pop('student', [])
+        students = validated_data.pop('students', [])
         employees = validated_data.pop('employees', [])
 
         owner = self.context['request'].user.employee
@@ -107,18 +108,18 @@ class GroupRoomSerializer(serializers.ModelSerializer):
 
         # Create the group room
         group_room = GroupRoom.objects.create(owner=owner, **validated_data)
-        group_room.student.set(students)
+        group_room.students.set(students)
         group_room.employees.set(unique_employees)
 
         return group_room
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        students = validated_data.pop('student', None)
+        students = validated_data.pop('students', None)
         employees = validated_data.pop('employees', None)
 
         if students is not None:
-            instance.student.set(students)
+            instance.students.set(students)
 
         if employees is not None:
             owner = instance.owner  # Keep the original owner
@@ -153,6 +154,13 @@ class GroupRoomSerializer(serializers.ModelSerializer):
             "name": f"{employee.user.first_name} {employee.user.last_name}",
             "role": employee.role
         } for employee in obj.employees.all()]
+    
+    def get_owner(self, obj):
+        return {
+            "id": obj.owner.id,
+            "name": f"{obj.owner.user.first_name} {obj.owner.user.last_name}",
+            "role": obj.owner.role
+        }
 
 class GroupMessageSerializer(serializers.ModelSerializer):
     sender = serializers.SerializerMethodField()
@@ -161,15 +169,17 @@ class GroupMessageSerializer(serializers.ModelSerializer):
         if obj.sender == self.context['request'].user:
             return 'You'
         elif hasattr(obj.sender, 'student'):
-            return {
-                'id': obj.sender.student.id,
-                'name': f"{obj.sender.card.first_name} {obj.sender.card.last_name}"
-            }
+            # return {
+            #     'id': obj.sender.student.id,
+            #     'name': f"{obj.sender.student.card.first_name} {obj.sender.student.card.last_name}"
+            # }
+            return f"{obj.sender.student.card.first_name} {obj.sender.student.card.last_name}"
         else: 
-            return {
-                'id': obj.sender.employee.id,
-                'name': f"{obj.sender.first_name} {obj.sender.last_name}"
-            }
+            # return {
+            #     'id': obj.sender.employee.id,
+            #     'name': f"{obj.sender.first_name} {obj.sender.last_name}"
+            # }
+            return f"{obj.sender.first_name} {obj.sender.last_name}"
 
     class Meta:
         model = GroupMessage

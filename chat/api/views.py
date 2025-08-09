@@ -4,6 +4,7 @@ from chat.models import *
 from .serializers import *
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError, NotFound, PermissionDenied
+from django.db.models import Max
 
 class ChatRoomView(ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -65,13 +66,20 @@ class GroupRoomView(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        if hasattr(user, 'student'):
-            # Return only the student's own room
-            return GroupRoom.objects.filter(student=user.student)
+        queryset = GroupRoom.objects.all()
 
-        if hasattr(user, 'employee'):
-            # Return all rooms where the employee is assigned
-            return GroupRoom.objects.filter(employees=user.employee)
+        if hasattr(user, 'student'):
+            queryset = queryset.filter(students=user.student)
+
+        elif hasattr(user, 'employee'):
+            queryset = queryset.filter(employees=user.employee)
+
+        # Annotate with latest message timestamp
+        queryset = queryset.annotate(
+            last_message_time=Max('group_messages__created_at')
+        ).order_by('-last_message_time', '-id')  # fallback to id if no messages
+
+        return queryset
         
     def create(self, request, *args, **kwargs):
         if not hasattr(request.user, 'employee'):
