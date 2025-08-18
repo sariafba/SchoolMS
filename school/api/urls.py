@@ -11,6 +11,7 @@ router.register('sections', SectionView)
 router.register('schedules', ScheduleView)
 router.register('placement-date', PlacementDateView)
 router.register('placements', PlacementView)
+router.register('attendances', AttendanceView)
 
 urlpatterns = [
     path('', include(router.urls)),

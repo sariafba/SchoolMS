@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from school.models import *
 from users.models import Teacher, Employee, Card
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from rest_framework.response import Response
 from rest_framework import status
-
-
+from users.models import Student
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 
 class StudyYearSerializer(serializers.ModelSerializer):
@@ -231,3 +232,57 @@ class PlacementSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class StudentAttendanceSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        source="student", queryset=Student.objects.all()
+    )
+
+    class Meta:
+        model = Attendance
+        fields = ["id", "excused", "note", "absent"]
+
+    def validate(self, attrs):
+        excused = attrs.get("excused")
+        note = attrs.get("note")
+        if excused and not note:
+            raise serializers.ValidationError(
+                {"note": "Note is required if excused is True."}
+            )
+        return attrs
+
+class BulkAttendanceSerializer(serializers.Serializer):
+    students = StudentAttendanceSerializer(many=True)
+
+    def create(self, validated_data):
+        attendances = []
+        for student_data in validated_data["students"]:
+            student = student_data["student"]
+            excused = student_data.get("excused", False)
+            note = student_data.get("note", None)
+            absent = student_data.get("absent", True)
+
+            obj, _ = Attendance.objects.update_or_create(
+                student=student,
+                defaults={
+                    "excused": excused,
+                    "note": note,
+                    "absent": absent,
+                },
+            )
+            attendances.append(obj)
+        return attendances
+    
+class AttendanceReadSerializer(serializers.ModelSerializer):
+    student = serializers.SerializerMethodField()
+
+    def get_student(self, obj):
+        return f"{obj.student.card.first_name} {obj.student.card.last_name}"
+
+    class Meta:
+        model = Attendance
+        fields = [
+            'id', 'student', 
+            'date', 
+            'absent', 'excused', 'note'
+        ]

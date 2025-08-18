@@ -17,18 +17,15 @@ class SubjectView(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['grade']
 
-
 class StudyYearView(ModelViewSet):
     queryset = StudyYear.objects.all()
     serializer_class = StudyYearSerializer
     permission_classes = [IsAdminCooperator]
 
-
 class StudyStageView(ModelViewSet):
     queryset = StudyStage.objects.all()
     serializer_class = StudyStageSerializer
     permission_classes = [IsAdminCooperator]
-
 
 class GradeView(ModelViewSet):
     queryset = Grade.objects.select_related('study_stage', 'study_year').all()
@@ -117,3 +114,33 @@ class PlacementView(ModelViewSet):
             return Response({"detail": "Placement limit reached for this date."}, status=status.HTTP_400_BAD_REQUEST)
 
         return super().create(request, *args, **kwargs)
+    
+class AttendanceView(ModelViewSet):
+    queryset = Attendance.objects.all()
+    serializer_class = BulkAttendanceSerializer
+    permission_classes = [AttendancePermission]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['student', 'student__section', 'date']
+
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'student'):
+            return Attendance.objects.filter(student=user.student)
+        return super().get_queryset()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return BulkAttendanceSerializer
+        return AttendanceReadSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        attendances = serializer.save()
+        return Response(
+            {"message": "Attendance recorded", "count": len(attendances)},
+            status=status.HTTP_201_CREATED,
+        )
+    

@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-
+from django.core.exceptions import ValidationError
 
 
 class Subject(models.Model):
@@ -97,3 +97,23 @@ class Placement(models.Model):
     #     self.parent2_card.delete()
     #     super().delete(*args, **kwargs)
     
+class Attendance(models.Model):
+    student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    absent = models.BooleanField(default=True)
+    excused = models.BooleanField(default=False)
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'date'], name='unique_attendance_per_student')
+        ]
+
+        
+    def clean(self):
+        if self.excused and not self.note:
+            raise ValidationError({"note": "Note is required if excused is True."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)

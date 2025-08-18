@@ -15,7 +15,6 @@ class IsAdminCooperatorReceptionist(BasePermission):
 
         return False
 
-
 class IsAdminCooperator(BasePermission):
 
     def has_permission(self, request, view):
@@ -48,7 +47,6 @@ class IsEmployee(BasePermission):
 
         return False
 
-
 class PlacementDatePermission(BasePermission):
     """
     Allow access for all if method GET 
@@ -74,3 +72,29 @@ class PlacementDatePermission(BasePermission):
             return True
 
         return False
+    
+class AttendancePermission(BasePermission):
+
+    def has_permission(self, request, view):
+       
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+        
+        if request.method in ['put', 'patch', 'delete']:
+            return False
+
+        if hasattr(request.user, 'student') and request.method == 'post':
+            return False
+        
+        if hasattr(request.user, 'employee'):
+            if request.user.employee.role in ['admin', 'cooperator']:
+                return True
+             
+        return True
+
+
+
+
