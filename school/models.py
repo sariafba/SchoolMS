@@ -117,3 +117,23 @@ class Attendance(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
+
+class Event(models.Model):
+    student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+
+
+
+
+
+
+
+
+
+
+
+
+

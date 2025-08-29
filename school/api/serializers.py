@@ -286,3 +286,21 @@ class AttendanceReadSerializer(serializers.ModelSerializer):
             'date', 
             'absent', 'excused', 'note'
         ]
+
+class EventSerializer(serializers.ModelSerializer):
+
+    student_name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Event
+        fields = ["id", "student", "student_name", "title", "description", "date", "time"]
+        extra_kwargs = {
+            "student": {"write_only": True},  
+        }
+
+    def get_student_name(self, obj):
+        return f"{obj.student.card.first_name} {obj.student.card.last_name}"
+
+
+
+

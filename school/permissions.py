@@ -95,6 +95,33 @@ class AttendancePermission(BasePermission):
              
         return True
 
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+class EventPermission(BasePermission):
+
+    def has_permission(self, request, view):
+        user = request.user
+
+        if hasattr(user, "employee"): 
+            if request.user.employee.role in ['admin', 'cooperator', 'teacher']:
+             return True
+
+        if hasattr(user, "student") and request.method in SAFE_METHODS:
+            return True
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        if hasattr(user, "employee"): 
+            if request.user.employee.role in ['admin', 'cooperator', 'teacher']:
+                return True
+
+        if hasattr(user, "student") and request.method in SAFE_METHODS:
+            return obj.student == user.student
+
+        return False
 
 
 

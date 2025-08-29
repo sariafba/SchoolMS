@@ -12,6 +12,7 @@ router.register('schedules', ScheduleView)
 router.register('placement-date', PlacementDateView)
 router.register('placements', PlacementView)
 router.register('attendances', AttendanceView)
+router.register('event', EventView)
 
 urlpatterns = [
     path('', include(router.urls)),

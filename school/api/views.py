@@ -144,3 +144,26 @@ class AttendanceView(ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
     
+class EventView(ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [EventPermission]
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['student__id', 'student__section', 'date']
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if hasattr(user, "employee"):
+            return Event.objects.all()
+
+        if hasattr(user, "student"):
+            return Event.objects.filter(student=user.student)
+
+
+
+
+
+
+    
