@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'posts.apps.PostsConfig',
     'landingpage.apps.LandingpageConfig',
     'chat.apps.ChatConfig',
+    'notification.apps.NotificationConfig',
 
     #
     'corsheaders',
