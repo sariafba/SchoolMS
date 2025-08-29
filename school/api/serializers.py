@@ -255,18 +255,41 @@ class AttendanceSerializer(serializers.ModelSerializer):
         return attendance
 
 class EventSerializer(serializers.ModelSerializer):
-
-    student_name = serializers.SerializerMethodField(read_only=True)
+    students = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Student.objects.all(), write_only=True
+    )
+    student_names = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Event
-        fields = ["id", "student", "student_name", "title", "description", "date", "time"]
+        fields = ["id", "students", "student_names", "title", "procedure", "note", "date"]
         extra_kwargs = {
-            "student": {"write_only": True},  
+            "students": {"write_only": True},  
         }
 
-    def get_student_name(self, obj):
-        return f"{obj.student.card.first_name} {obj.student.card.last_name}"
+    def get_student_names(self, obj):
+        return [{
+            "id": student.id,
+            "name": f"{student.card.first_name} {student.card.last_name}"
+            }
+            for student in obj.students.all()
+        ]
+
+    def create(self, validated_data):
+        students = validated_data.pop("students", [])
+        event = Event.objects.create(**validated_data)
+        event.students.set(students)
+        return event
+
+    def update(self, instance, validated_data):
+        students = validated_data.pop("students", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if students is not None:
+            instance.students.set(students)
+        return instance
+
 
 
 

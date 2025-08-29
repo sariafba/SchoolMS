@@ -159,7 +159,7 @@ class EventView(ModelViewSet):
     permission_classes = [EventPermission]
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['student__id', 'student__section', 'date']
+    filterset_fields = ['students__id', 'students__section', 'date']
 
     def get_queryset(self):
         user = self.request.user
@@ -168,7 +168,12 @@ class EventView(ModelViewSet):
             return Event.objects.all()
 
         if hasattr(user, "student"):
-            return Event.objects.filter(student=user.student)
+            return Event.objects.filter(students=user.student)
+        
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        return queryset.distinct()
+
 
 
 

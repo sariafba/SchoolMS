@@ -119,11 +119,22 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
 
 class Event(models.Model):
-    student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
-    description = models.TextField()
-    date = models.DateField()
-    time = models.TimeField()
+    students = models.ManyToManyField('users.Student', related_name='events')
+    date = models.DateTimeField()
+    title = models.CharField(max_length=20, choices=[
+        ('مشاجرة', 'مشاجرة'),
+        ('تنمر', 'تنمر'),
+        ('سوء تصرف', 'سوء تصرف'),
+        ('تخريب اساس المدرسة', 'تخريب اساس المدرسة'),
+        ('اخرى', 'اخرى')
+    ])
+    procedure = models.CharField(max_length=20, choices=[
+        ('تنبيه شفهي', 'تنبيه شفهي'),
+        ('استدعاء ولي امر', 'استدعاء ولي امر'),
+        ('كتابة تعهد', 'كتابة تعهد'),
+        ('فصل نهائي', 'فصل نهائي')
+    ])
+    note = models.TextField(blank=True, null=True)
 
 
 
