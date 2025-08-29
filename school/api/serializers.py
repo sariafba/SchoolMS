@@ -233,59 +233,26 @@ class PlacementSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class StudentAttendanceSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        source="student", queryset=Student.objects.all()
-    )
+class AttendanceSerializer(serializers.ModelSerializer):
+    student_id = serializers.IntegerField()
+    student_name = serializers.SerializerMethodField(read_only=True)
 
-    class Meta:
-        model = Attendance
-        fields = ["id", "excused", "note", "absent"]
-
-    def validate(self, attrs):
-        excused = attrs.get("excused")
-        note = attrs.get("note")
-        if excused and not note:
-            raise serializers.ValidationError(
-                {"note": "Note is required if excused is True."}
-            )
-        return attrs
-
-class BulkAttendanceSerializer(serializers.Serializer):
-    students = StudentAttendanceSerializer(many=True)
-
-    def create(self, validated_data):
-        attendances = []
-        for student_data in validated_data["students"]:
-            student = student_data["student"]
-            excused = student_data.get("excused", False)
-            note = student_data.get("note", None)
-            absent = student_data.get("absent", True)
-
-            obj, _ = Attendance.objects.update_or_create(
-                student=student,
-                defaults={
-                    "excused": excused,
-                    "note": note,
-                    "absent": absent,
-                },
-            )
-            attendances.append(obj)
-        return attendances
-    
-class AttendanceReadSerializer(serializers.ModelSerializer):
-    student = serializers.SerializerMethodField()
-
-    def get_student(self, obj):
+    def get_student_name(self, obj):
         return f"{obj.student.card.first_name} {obj.student.card.last_name}"
 
     class Meta:
         model = Attendance
-        fields = [
-            'id', 'student', 
-            'date', 
-            'absent', 'excused', 'note'
-        ]
+        fields = ["student_id", "student_name", "date", "absent", "excused", "note"]
+        list_serializer_class = serializers.ListSerializer
+
+    def create(self, validated_data):
+        student_id = validated_data.pop("student_id")
+        attendance, _ = Attendance.objects.update_or_create(
+            student_id=student_id,
+            date=validated_data.get("date"),
+            defaults=validated_data
+        )
+        return attendance
 
 class EventSerializer(serializers.ModelSerializer):
 

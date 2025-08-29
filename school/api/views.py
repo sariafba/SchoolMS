@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from .serializers import *
 from school.models import *
 from django_filters.rest_framework import DjangoFilterBackend
@@ -115,34 +116,42 @@ class PlacementView(ModelViewSet):
 
         return super().create(request, *args, **kwargs)
     
-class AttendanceView(ModelViewSet):
-    queryset = Attendance.objects.all()
-    serializer_class = BulkAttendanceSerializer
-    permission_classes = [AttendancePermission]
+class AttendanceView(APIView):
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['student', 'student__section', 'date']
+    filterset_fields = ['student__section', 'student', 'date']
 
-    def get_queryset(self):
-        user = self.request.user
-        if hasattr(user, 'student'):
-            return Attendance.objects.filter(student=user.student)
-        return super().get_queryset()
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return BulkAttendanceSerializer
-        return AttendanceReadSerializer
+    def filter_queryset(self, queryset):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(
-            data=request.data,
-        )
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if not (
+                user.is_superuser or
+                (hasattr(user, 'employee') and user.employee.role in ['admin', 'cooperator'])
+        ):
+            return Response({"detail": "You do not have permission to perform this action."}, status=403)
+
+        serializer = AttendanceSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
-        attendances = serializer.save()
-        return Response(
-            {"message": "Attendance recorded", "count": len(attendances)},
-            status=status.HTTP_201_CREATED,
-        )
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        if hasattr(user, 'employee') and user.employee.role in ['admin', 'cooperator']:
+            attendances = Attendance.objects.all()
+        else:
+            attendances = Attendance.objects.filter(student__user=user)
+
+        attendances = self.filter_queryset(attendances)
+
+        serializer = AttendanceSerializer(attendances, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class EventView(ModelViewSet):
     queryset = Event.objects.all()

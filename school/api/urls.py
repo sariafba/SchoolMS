@@ -11,9 +11,10 @@ router.register('sections', SectionView)
 router.register('schedules', ScheduleView)
 router.register('placement-date', PlacementDateView)
 router.register('placements', PlacementView)
-router.register('attendances', AttendanceView)
 router.register('event', EventView)
 
 urlpatterns = [
     path('', include(router.urls)),
+
+    path("attendances/", AttendanceView.as_view(), name="attendances"),
 ]
