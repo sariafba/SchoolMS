@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-
+from django.utils import timezone 
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
@@ -99,7 +98,7 @@ class Placement(models.Model):
     
 class Attendance(models.Model):
     student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField(default=timezone.now)
     absent = models.BooleanField(default=True)
     excused = models.BooleanField(default=False)
     note = models.TextField(blank=True, null=True)
@@ -108,15 +107,6 @@ class Attendance(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['student', 'date'], name='unique_attendance_per_student')
         ]
-
-        
-    def clean(self):
-        if self.excused and not self.note:
-            raise ValidationError({"note": "Note is required if excused is True."})
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
 
 class Event(models.Model):
     students = models.ManyToManyField('users.Student', related_name='events')

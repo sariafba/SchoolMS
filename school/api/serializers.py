@@ -245,14 +245,21 @@ class AttendanceSerializer(serializers.ModelSerializer):
         fields = ["student_id", "student_name", "date", "absent", "excused", "note"]
         list_serializer_class = serializers.ListSerializer
 
+    @transaction.atomic
     def create(self, validated_data):
         student_id = validated_data.pop("student_id")
-        attendance, _ = Attendance.objects.update_or_create(
-            student_id=student_id,
-            date=validated_data.get("date"),
-            defaults=validated_data
-        )
-        return attendance
+        date = validated_data.get("date")
+
+        try:
+            attendance = Attendance.objects.create(
+                student_id=student_id,
+                **validated_data
+            )
+            return attendance
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {"detail": f"Attendance already exists for student {student_id} on {date or 'today'}"}
+            )
 
 class EventSerializer(serializers.ModelSerializer):
     students = serializers.PrimaryKeyRelatedField(
