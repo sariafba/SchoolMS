@@ -153,6 +153,32 @@ class AttendanceView(APIView):
         serializer = AttendanceSerializer(attendances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            attendance = Attendance.objects.get(pk=pk)
+        except Attendance.DoesNotExist:
+            return Response({"detail": "Attendance not found."}, status=404)
+
+        # Check object-level permission
+        self.check_object_permissions(request, attendance)
+
+        serializer = AttendanceSerializer(attendance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            attendance = Attendance.objects.get(pk=pk)
+        except Attendance.DoesNotExist:
+            return Response({"detail": "Attendance not found."}, status=404)
+
+        # Check object-level permission
+        self.check_object_permissions(request, attendance)
+
+        attendance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 class EventView(ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer

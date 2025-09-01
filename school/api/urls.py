@@ -17,6 +17,7 @@ urlpatterns = [
     path('', include(router.urls)),
 
     path("attendances/", AttendanceView.as_view(), name="attendances"),
+    path('attendances/<int:pk>/', AttendanceView.as_view()),
     path("marks/", MarkView.as_view(), name="marks"),
     path('marks/<int:pk>/', MarkView.as_view()), 
 ]
