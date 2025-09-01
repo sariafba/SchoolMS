@@ -123,5 +123,48 @@ class EventPermission(BasePermission):
 
         return False
 
+class MarkPermission(BasePermission):
 
+    def has_permission(self, request, view):
+        user = request.user
+
+        # Admin: read-only
+        if hasattr(user, "employee") and user.employee.role == "admin":
+            return request.method in SAFE_METHODS
+
+        # Cooperator: full access
+        if hasattr(user, "employee") and user.employee.role == "cooperator":
+            return True
+
+        # Teacher: full access (object-level will restrict subjects)
+        if hasattr(user, "employee") and user.employee.role == "teacher":
+            return True
+
+        # Student: read-only
+        if hasattr(user, "student"):
+            return request.method in SAFE_METHODS
+
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+
+        # Admin: read-only
+        if hasattr(user, "employee") and user.employee.role == "admin":
+            return request.method in SAFE_METHODS
+
+        # Cooperator: full access
+        if hasattr(user, "employee") and user.employee.role == "cooperator":
+            return True
+
+        # Teacher: only if subject in teacher's subjects
+        if hasattr(user, "employee") and user.employee.role == "teacher":
+            teacher = user.employee.teacher
+            return obj.subject in teacher.subjects.all()
+
+        # Student: only their own marks (read-only)
+        if hasattr(user, "student") and request.method in SAFE_METHODS:
+            return obj.student == user.student
+
+        return False
 

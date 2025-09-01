@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import RegexValidator
 from django.utils import timezone 
+from django.db.models import Q
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
@@ -48,7 +49,7 @@ class Grade(models.Model):
 class Section(models.Model):
     name = models.CharField(max_length=100)
     limit = models.IntegerField()
-    grade = models.ForeignKey('Grade', on_delete=models.CASCADE)
+    grade = models.ForeignKey('Grade', on_delete=models.CASCADE, related_name='sections')
 
     class Meta:
         constraints = [
@@ -126,7 +127,35 @@ class Event(models.Model):
     ])
     note = models.TextField(blank=True, null=True)
 
+class Mark(models.Model):
+    student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
+    top_mark = models.IntegerField()
+    pass_mark = models.IntegerField()
+    mark = models.IntegerField(default=0)
+    mark_type = models.CharField(max_length=20, choices=[
 
+        ('oral test', 'Oral Test'),
+        ('written quiz', 'Written Quiz'),
+
+        ('exam 1', 'Exam 1'),
+        ('exam 2', 'Exam 2'),
+        ('midterm', 'Midterm'),
+
+        ('exam 3', 'Exam 3'),
+        ('exam 4', 'Exam 4'),
+        ('final', 'Final'),
+    ])
+    date = models.DateField()
+
+    # class Meta:
+    #     constraints = [
+    #         models.UniqueConstraint(
+    #             fields=['student', 'subject', 'mark_type'],
+    #             name="unique_exam_per_student_subject",
+    #             condition=Q(mark_type__in=['exam 1', 'exam 2', 'exam 3', 'exam 4', 'midterm', 'final']),
+    #         )
+    #     ]
 
 
 

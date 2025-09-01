@@ -259,7 +259,7 @@ class AttendanceSerializer(serializers.ModelSerializer):
         except IntegrityError:
             raise serializers.ValidationError(
                 {"detail": f"Attendance already exists for student {student_id} on {date or 'today'}"}
-            )
+        )
 
 class EventSerializer(serializers.ModelSerializer):
     students = serializers.PrimaryKeyRelatedField(
@@ -297,7 +297,53 @@ class EventSerializer(serializers.ModelSerializer):
             instance.students.set(students)
         return instance
 
+class MarkSerializer(serializers.ModelSerializer):
+    student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all(), write_only=True)
+    subject = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), write_only=True)
+    student_name = serializers.SerializerMethodField(read_only=True)
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
 
+    def get_student_name(self, obj):
+        return f"{obj.student.card.first_name} {obj.student.card.last_name}"
 
+    class Meta:
+        model = Mark
+        fields = ["id","student", "student_name", "subject", "subject_name", "mark", "mark_type", "top_mark", "pass_mark", "date"]
+        list_serializer_class = serializers.ListSerializer
 
+    def validate(self, data):
+        student = data.get("student")
+        subject = data.get("subject")
+        mark_type = data.get("mark_type")
 
+        restricted_types = ["exam 1", "exam 2", "exam 3", "exam 4", "midterm", "final"]
+
+        if mark_type in restricted_types:
+            exists = Mark.objects.filter(
+                student=student, subject=subject, mark_type=mark_type
+            ).exists()
+
+            if exists:
+                student_name = f"{student.card.first_name} {student.card.last_name}"
+                raise serializers.ValidationError(
+                    {
+                        "detail": f"{mark_type} already exists for student {student_name} (ID: {student.id}) in subject {subject.name}."
+                    }
+                )
+
+        return data
+
+    def create(self, validated_data):
+        subject = validated_data.get('subject')
+        student = validated_data.get('student')
+        employee = self.context['request'].user.employee
+
+        if employee.role == 'teacher':
+            teacher = employee.teacher
+            if subject not in teacher.subjects.all():
+                raise serializers.ValidationError({"detail": f"Subject does not belong to teacher"})
+        
+        if student not in Student.objects.filter(section__in=subject.grade.sections.all()):
+            raise serializers.ValidationError({"detail": f"Student does has this subject"})
+        
+        return super().create(validated_data)

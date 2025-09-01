@@ -174,8 +174,72 @@ class EventView(ModelViewSet):
         queryset = super().filter_queryset(queryset)
         return queryset.distinct()
 
+class MarkView(APIView):
+    permission_classes = [MarkPermission]
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['student', 'subject', 'mark_type', 'subject__grade__sections']
+
+    def filter_queryset(self, queryset):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(self.request, queryset, self)
+        return queryset
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if not (
+                user.is_superuser or
+                (hasattr(user, 'employee') and user.employee.role in ['teacher', 'cooperator'])
+        ):
+            return Response({"detail": "You do not have permission to perform this action."}, status=403)
+
+        serializer = MarkSerializer(data=request.data, many=True, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+    def get(self, request, *args, **kwargs):
+        user = request.user
+
+        if hasattr(user, 'employee') and user.employee.role in ['admin', 'cooperator']:
+            marks = Mark.objects.all()
+        elif hasattr(user, 'employee') and user.employee.role in ['teacher']:
+            teacher = user.employee.teacher
+            marks = Mark.objects.filter(subject__in=teacher.subjects.all())
+        else:
+            marks = Mark.objects.filter(student__user=user)
+
+        marks = self.filter_queryset(marks)
+
+        serializer = MarkSerializer(marks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk, *args, **kwargs):
+        try:
+            mark = Mark.objects.get(pk=pk)
+        except Mark.DoesNotExist:
+            return Response({"detail": "Mark not found."}, status=404)
+
+        # Check object-level permission
+        self.check_object_permissions(request, mark)
+
+        serializer = MarkSerializer(mark, data=request.data, partial=True, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, pk, *args, **kwargs):
+        try:
+            mark = Mark.objects.get(pk=pk)
+        except Mark.DoesNotExist:
+            return Response({"detail": "Mark not found."}, status=404)
+
+        # Check object-level permission
+        self.check_object_permissions(request, mark)
+
+        mark.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
