@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/posts/', include('posts.api.urls')),
     path('api/landingpage/', include('landingpage.api.urls')),
     path('api/chat/', include('chat.api.urls')),
+    path('api/accounting/', include('accounting.api.urls')),
 ]
 
 from django.conf import settings

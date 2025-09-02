@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'landingpage.apps.LandingpageConfig',
     'chat.apps.ChatConfig',
     'notification.apps.NotificationConfig',
+    'accounting.apps.AccountingConfig',
 
     #
     'corsheaders',
