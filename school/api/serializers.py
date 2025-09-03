@@ -57,10 +57,19 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_grade(self, obj):
-        return obj.grade.name
+        return {
+            'id': obj.grade.id,
+            'name': obj.grade.name
+        }
 
     def get_teacher(self, obj):
-        return [str(teacher) for teacher in obj.teachers.all()]
+        return [
+            {
+                "id": teacher.id,
+                "name": str(teacher)  # يستخدم __str__ للمدرس
+            }
+            for teacher in obj.teachers.all()
+    ]
 
 class SectionSerializer(serializers.ModelSerializer):
     

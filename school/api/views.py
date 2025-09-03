@@ -16,7 +16,7 @@ class SubjectView(ModelViewSet):
     permission_classes = [IsAdminCooperator]
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['grade']
+    filterset_fields = ['grade', 'teachers']
 
 class StudyYearView(ModelViewSet):
     queryset = StudyYear.objects.all()
