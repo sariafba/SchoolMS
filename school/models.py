@@ -99,7 +99,7 @@ class Placement(models.Model):
     
 class Attendance(models.Model):
     student = models.ForeignKey('users.Student', on_delete=models.CASCADE)
-    date = models.DateField(default=timezone.now)
+    date = models.DateField(default=timezone.localdate)
     absent = models.BooleanField(default=True)
     excused = models.BooleanField(default=False)
     note = models.TextField(blank=True, null=True)
