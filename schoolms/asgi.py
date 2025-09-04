@@ -22,6 +22,7 @@ from channels_auth_token_middlewares.middleware import (
 )
 import posts.routing as PostRouter
 import chat.routing as ChatRouter
+import notification.routing as NotificationRouter
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
@@ -29,7 +30,8 @@ application = ProtocolTypeRouter({
         SimpleJWTAuthTokenMiddleware(  # Inner: validates JWT
             URLRouter(
                 PostRouter.websocket_urlpatterns +
-                ChatRouter.websocket_urlpatterns
+                ChatRouter.websocket_urlpatterns +
+                NotificationRouter.websocket_urlpatterns
             )
         )
     ),
