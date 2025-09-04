@@ -204,7 +204,7 @@ class MarkView(APIView):
     permission_classes = [MarkPermission]
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['student', 'subject', 'mark_type', 'student__section']
+    filterset_fields = ['student', 'subject', 'mark_type', 'student__section', 'date']
 
     def filter_queryset(self, queryset):
         for backend in list(self.filter_backends):

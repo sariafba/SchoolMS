@@ -83,3 +83,18 @@ class EmployeePermission(BasePermission):
                     f"You are not allowed to change role to '{new_role}'."
                 )
             return True
+        
+class IsAdminCooperatorReceptionistTeacher(BasePermission):
+
+    def has_permission(self, request, view):        
+        if not request.user.is_authenticated:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
+        employee = getattr(request.user, 'employee', None)
+        if employee and employee.role in ['admin', 'cooperator', 'receptionist', 'teacher']:
+            return True
+
+        return False        

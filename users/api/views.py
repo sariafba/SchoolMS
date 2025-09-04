@@ -3,7 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from users.models import Employee, Student
 from .serializers import EmployeeSerializer, StudentSerializer, CreateStudentSerializer
-from users.permissions import EmployeePermission
+from users.permissions import *
 from rest_framework.response import Response
 from rest_framework import status
 from school.permissions import IsAdminCooperatorReceptionist
@@ -47,7 +47,7 @@ class StudentView(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['section', 'section__grade']
 
-    permission_classes = [IsAdminCooperatorReceptionist]
+    permission_classes = [IsAdminCooperatorReceptionistTeacher]
     
 class CreateStudentView(CreateAPIView):
     queryset = Student.objects.all()
