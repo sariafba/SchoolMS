@@ -51,7 +51,7 @@ class SectionView(ModelViewSet):
 class ScheduleView(ModelViewSet):
     queryset = Schedule.objects.all()
     serializer_class = ScheduleSerializer
-    permission_classes = [IsEmployee]
+    permission_classes = [IsAuthenticated]
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['teacher', 'section', 'day']
