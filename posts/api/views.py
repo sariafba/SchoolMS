@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.db.models import Q
 
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
@@ -15,6 +16,20 @@ class PostView(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['sections', 'sections__grade',]
 
+
+    def get_queryset(self):
+        user = self.request.user
+
+        qs = Post.objects.all()
+
+        if hasattr(user, "student"):
+            # Student: add posts from their single section
+            student_section = user.student.section
+            qs = Post.objects.filter(
+                Q(is_public=True) | Q(sections=student_section)
+            ).distinct()
+
+        return qs
 
     def create(self, request, *args, **kwargs):
         # Create post normally

@@ -106,6 +106,6 @@ class TeacherFactory(factory.django.DjangoModelFactory):
                 self.subjects.add(subject)
         else:
             # Otherwise, randomly assign some subjects
-            subjects = Subject.objects.order_by('?')[:2]  # pick 2 random subjects
+            subjects = Subject.objects.order_by('?')[:1]  # pick 2 random subjects
             self.subjects.set(subjects)
 
