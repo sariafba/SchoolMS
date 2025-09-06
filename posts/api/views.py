@@ -8,6 +8,7 @@ from rest_framework import status
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from django.db.models import Q
+from rest_framework.decorators import action
 
 class PostView(ModelViewSet):
     queryset = Post.objects.all()
@@ -63,6 +64,21 @@ class PostView(ModelViewSet):
             
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=True, methods=['POST'], permission_classes=[IsAuthenticated])
+    def toggle_like(self, request, pk=None):
+        post = self.get_queryset().filter(pk=pk).first()
+        if not post:
+            return Response({'detail': 'Post not found or not accessible.'}, status=404)
+
+        like, created = PostLike.objects.get_or_create(post=post, user=request.user)
+
+        if not created:
+            # User already liked it → unlike
+            like.delete()
+            return Response({'status': 'unliked', 'like_count': post.likes.count()})
+
+        return Response({'status': 'liked', 'like_count': post.likes.count()})
     
 class CommentView(ModelViewSet):
     queryset = Comment.objects.all()

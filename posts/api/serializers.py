@@ -28,13 +28,14 @@ class PostSerializer(serializers.ModelSerializer):
         # allow_empty=False
     )
 
+    is_liked = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField(read_only=True)  # <-- here
 
     class Meta:
         model = Post
         fields = [
             'id', 'user', 'is_public', 'title', 'text', 'sections', 'section_ids',
-            'created_at', 'updated_at', 'attachments', 'comments'
+            'created_at', 'updated_at', 'attachments', 'comments', 'like_count', 'is_liked'
         ]
 
     def get_comments(self, obj):
@@ -45,7 +46,11 @@ class PostSerializer(serializers.ModelSerializer):
                 .prefetch_related('replies__user'))
         return CommentSerializer(qs, many=True, context=self.context).data
 
-  
+    def get_is_liked(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return obj.likes.filter(user=user).exists()
+        return False
 
     def validate(self, attrs):
         is_public = attrs.get('is_public', True)

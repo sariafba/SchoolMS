@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 import os
 from mimetypes import guess_type
+from django.conf import settings
 
 
 
@@ -14,12 +15,29 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def like_count(self):
+        return self.likes.count()
+
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
         return f"Post by {self.user.username} - {self.created_at}"
     
+class PostLike(models.Model):
+    post = models.ForeignKey('Post', on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='liked_posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('post', 'user')  # Ensures a user can like a post only once
+
+    def __str__(self):
+        return f"{self.user.username} liked {self.post.id}"
+
+
+
 """Attachments"""                                                                        
 def attachment_upload_to(instance, filename):
     """Generate upload path for attachments: attachments/user_id/timestamp/filename"""
