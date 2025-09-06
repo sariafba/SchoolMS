@@ -12,4 +12,5 @@ router.register('visits', VisitView)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),
 ]
