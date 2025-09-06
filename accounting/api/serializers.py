@@ -45,14 +45,15 @@ class PaymentSerializer(serializers.ModelSerializer):
     student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all(), write_only=True)
 
     fee_assignment = serializers.PrimaryKeyRelatedField(queryset=FeeAssignment.objects.all(), write_only=True)
-    fee_assignment_data = FeeAssignmentSerializer(source="fee_assignment", read_only=True)
+    # fee_assignment_data = FeeAssignmentSerializer(source="fee_assignment", read_only=True)
 
     class Meta:
         model = Payment
         fields = [
             "id",
             "student",
-            "fee_assignment", "fee_assignment_data",
+            "fee_assignment",
+            # "fee_assignment_data",
             "amount_paid",
             "date",
         ]

@@ -21,17 +21,17 @@ class SubjectView(ModelViewSet):
 class StudyYearView(ModelViewSet):
     queryset = StudyYear.objects.all()
     serializer_class = StudyYearSerializer
-    permission_classes = [IsAdminCooperator]
+    permission_classes = [IsEmployee]
 
 class StudyStageView(ModelViewSet):
     queryset = StudyStage.objects.all()
     serializer_class = StudyStageSerializer
-    permission_classes = [IsAdminCooperator]
+    permission_classes = [IsEmployee]
 
 class GradeView(ModelViewSet):
     queryset = Grade.objects.select_related('study_stage', 'study_year').all()
     serializer_class = GradeSerializer
-    permission_classes = [IsAdminCooperator]
+    permission_classes = [IsEmployee]
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = [
