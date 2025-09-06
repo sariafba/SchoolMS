@@ -22,7 +22,7 @@ def send_ws_notification(student_id, notification_id, message, notif_type):
 @receiver(post_save, sender=Attendance)
 def attendance_created(sender, instance, created, **kwargs):
     if created:
-        message = f"Attendance recorded for {instance.date}"
+        message = f"Absence recorded for {instance.date}"
         notification = Notification.objects.create(student=instance.student, message=message, notification_type="attendance")
         send_ws_notification(instance.student.id, notification.id, message, "attendance")
 
@@ -37,6 +37,6 @@ def mark_created(sender, instance, created, **kwargs):
 def event_students_added(sender, instance, action, pk_set, **kwargs):
     if action == "post_add":
         for student_id in pk_set:
-            message = f"New event: {instance.title}"
+            message = f"New Incidents: {instance.title}"
             notification = Notification.objects.create(student_id=student_id, message=message, notification_type="event")
             send_ws_notification(student_id, notification.id, message, "event")
